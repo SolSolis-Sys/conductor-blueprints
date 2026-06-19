@@ -2,22 +2,28 @@
   "version": "1.0.0",
   "blueprints": [
     {
+      "id": "solsolis/tdd-bug-hunter",
       "name": "tdd-bug-hunter",
-      "description": "Finds bugs using a TDD-driven adversarial loop",
+      "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
       "author": "SolSolis-Sys",
-      "tags": ["tdd", "bugs", "adversarial"]
+      "tags": ["tdd", "bugs", "adversarial"],
+      "cost_tier": "medium"
     },
     {
+      "id": "solsolis/adversarial-review",
       "name": "adversarial-review",
       "description": "Multi-perspective code review with independent refuters",
       "author": "SolSolis-Sys",
-      "tags": ["review", "adversarial", "quality"]
+      "tags": ["review", "adversarial", "quality"],
+      "cost_tier": "high"
     },
     {
+      "id": "solsolis/ci-polling",
       "name": "ci-polling",
       "description": "Polls CI status and summarizes failures",
       "author": "SolSolis-Sys",
-      "tags": ["ci", "polling", "automation"]
+      "tags": ["ci", "polling", "automation"],
+      "cost_tier": "low"
     }
   ]
 }

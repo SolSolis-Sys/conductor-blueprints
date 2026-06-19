@@ -1,16 +1,24 @@
 {
+  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "id": "solsolis/tdd-bug-hunter",
   "name": "tdd-bug-hunter",
   "version": "1.0.0",
+  "title": "TDD Bug Hunter Loop",
   "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["tdd", "bugs", "adversarial"],
+  "inputs": [
+    { "name": "target", "type": "string", "description": "File or directory to hunt bugs in", "required": true },
+    { "name": "max_rounds", "type": "number", "description": "Max loop iterations", "default": 10 }
+  ],
+  "cost_profile": { "tier": "medium", "avg_tokens_per_run": 40000, "estimated_cost_usd": 0.12 },
+  "permissions": { "network": false, "filesystem": "read-write", "allowed_commands": [] },
   "agents": [
     { "role": "finder", "prompt": "Find one untested bug in {{target}}. Return: file, line, description, minimal repro." },
     { "role": "test-writer", "prompt": "Write a failing test for this bug: {{bug}}. Use the project's test framework." },
     { "role": "fixer", "prompt": "Fix the bug exposed by this test: {{test}}. Minimal change only." },
     { "role": "verifier", "prompt": "Run the tests and verify the fix. Confirm green. If not, report what failed." }
   ],
-  "loop": {
-    "exit_condition": "2 consecutive rounds with no new bugs found",
-    "max_rounds": 10
-  },
-  "variables": ["target"]
+  "loop": { "exit_condition": "2 consecutive rounds with no new bugs found", "max_rounds": "{{max_rounds}}" }
 }

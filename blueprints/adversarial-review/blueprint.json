@@ -1,13 +1,23 @@
 {
+  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "id": "solsolis/adversarial-review",
   "name": "adversarial-review",
   "version": "1.0.0",
-  "description": "3-refuter adversarial review: finding survives only if 2/3 refuters fail to disprove it",
+  "title": "Adversarial Review",
+  "description": "Multi-perspective code review: finding survives only if 2/3 refuters fail to disprove it",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["review", "adversarial", "quality", "security"],
+  "inputs": [
+    { "name": "target", "type": "string", "description": "File or directory to review", "required": true }
+  ],
+  "cost_profile": { "tier": "high", "avg_tokens_per_run": 80000, "estimated_cost_usd": 0.24 },
+  "permissions": { "network": false, "filesystem": "read-only", "allowed_commands": [] },
   "agents": [
     { "role": "finder", "prompt": "Find bugs, security issues, or logic errors in {{target}}. List each as: file:line — description." },
     { "role": "refuter-1", "prompt": "Try to REFUTE this finding: {{finding}}. Default to refuted=true if uncertain. Return: {refuted: bool, reason: str}" },
     { "role": "refuter-2", "prompt": "Try to REFUTE this finding: {{finding}}. Default to refuted=true if uncertain. Return: {refuted: bool, reason: str}" },
     { "role": "refuter-3", "prompt": "Try to REFUTE this finding: {{finding}}. Default to refuted=true if uncertain. Return: {refuted: bool, reason: str}" }
   ],
-  "verdict": "finding confirmed if refuted_count < 2",
-  "variables": ["target"]
+  "verdict": "finding confirmed if refuted_count < 2"
 }

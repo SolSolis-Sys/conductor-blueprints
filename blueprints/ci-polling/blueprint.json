@@ -1,15 +1,22 @@
 {
+  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "id": "solsolis/ci-polling",
   "name": "ci-polling",
   "version": "1.0.0",
-  "description": "Polls CI run status every N seconds until done, then summarizes failures",
+  "title": "CI Polling & Auto-Fix",
+  "description": "Polls CI status every N seconds until done, then summarizes failures",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["ci", "polling", "automation", "github"],
+  "inputs": [
+    { "name": "run_id", "type": "string", "description": "GitHub Actions run ID", "required": true },
+    { "name": "poll_interval_seconds", "type": "number", "description": "Polling interval in seconds", "default": 30 }
+  ],
+  "cost_profile": { "tier": "low", "avg_tokens_per_run": 8000, "estimated_cost_usd": 0.02 },
+  "permissions": { "network": true, "filesystem": "none", "allowed_commands": ["gh run view"] },
   "agents": [
-    { "role": "poller", "prompt": "Check CI status for {{run_id}} using `gh run view {{run_id}}`. Return: {status: 'pending'|'success'|'failure', summary: str}" },
+    { "role": "poller", "prompt": "Check CI status for run {{run_id}} using `gh run view {{run_id}}`. Return: {status: 'pending'|'success'|'failure', summary: str}" },
     { "role": "analyzer", "prompt": "Given these CI failures: {{failures}}. Identify root cause and suggest fix for each." }
   ],
-  "loop": {
-    "poll_interval_seconds": 30,
-    "exit_condition": "status != 'pending'",
-    "max_polls": 20
-  },
-  "variables": ["run_id"]
+  "loop": { "poll_interval_seconds": "{{poll_interval_seconds}}", "exit_condition": "status != 'pending'", "max_polls": 20 }
 }

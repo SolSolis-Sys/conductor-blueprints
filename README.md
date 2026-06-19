@@ -5,6 +5,10 @@
 ![Blueprints](https://img.shields.io/badge/blueprints-3-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+> ⚠️ **Alpha — work in progress. Use at your own risk.** Expect rough edges. Found a bug or have a suggestion? Please [open an issue]
+
+> **Not affiliated with Anthropic.** This is an independent, unofficial tool that reads local Claude Code data and Anthropic's public OAuth usage endpoint — not a product of or endorsed by Anthropic.
+
 ---
 
 ## Available Blueprints

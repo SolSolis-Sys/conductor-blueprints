@@ -1,9 +1,10 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "blueprints": [
     {
       "id": "solsolis/tdd-bug-hunter",
       "name": "tdd-bug-hunter",
+      "version": "1.0.0",
       "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
       "author": "SolSolis-Sys",
       "tags": ["tdd", "bugs", "adversarial"],
@@ -12,17 +13,28 @@
     {
       "id": "solsolis/adversarial-review",
       "name": "adversarial-review",
-      "description": "Multi-perspective code review with independent refuters",
+      "version": "1.1.0",
+      "description": "Multi-perspective code review with N independent refuters — only surviving findings are reported",
       "author": "SolSolis-Sys",
-      "tags": ["review", "adversarial", "quality"],
+      "tags": ["review", "adversarial", "quality", "security"],
       "cost_tier": "high"
     },
     {
       "id": "solsolis/ci-polling",
       "name": "ci-polling",
-      "description": "Polls CI status and summarizes failures",
+      "version": "1.1.0",
+      "description": "Polls CI status, extracts failure logs, applies auto-fix, loops until green",
       "author": "SolSolis-Sys",
-      "tags": ["ci", "polling", "automation"],
+      "tags": ["ci", "polling", "automation", "auto-fix"],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/deploy-verify",
+      "name": "deploy-verify",
+      "version": "1.0.0",
+      "description": "Post-deploy health polling loop with smoke tests and optional auto-rollback",
+      "author": "SolSolis-Sys",
+      "tags": ["deploy", "verification", "health-check", "smoke-test", "devops"],
       "cost_tier": "low"
     }
   ]

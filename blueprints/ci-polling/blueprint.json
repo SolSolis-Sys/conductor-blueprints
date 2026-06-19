@@ -1,22 +1,42 @@
 {
-  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
   "id": "solsolis/ci-polling",
   "name": "ci-polling",
-  "version": "1.0.0",
-  "title": "CI Polling & Auto-Fix",
-  "description": "Polls CI status every N seconds until done, then summarizes failures",
+  "version": "1.1.0",
+  "title": "CI Polling & Auto-Fix Loop",
+  "description": "Polls CI status on a branch. On failure: extracts logs, feeds Claude, applies minimal fix, commits and re-pushes. Loops until green or max attempts. Inspired by loops.elorm.xyz 'Ship PR Until Green' pattern.",
   "author": "SolSolis-Sys",
   "license": "MIT",
-  "tags": ["ci", "polling", "automation", "github"],
+  "tags": ["ci", "polling", "automation", "auto-fix", "github-actions"],
   "inputs": [
-    { "name": "run_id", "type": "string", "description": "GitHub Actions run ID", "required": true },
-    { "name": "poll_interval_seconds", "type": "number", "description": "Polling interval in seconds", "default": 30 }
+    { "name": "branch", "type": "string", "description": "Branch to watch", "required": true },
+    { "name": "repo", "type": "string", "description": "GitHub repo slug (owner/name)", "required": true },
+    { "name": "poll_interval_seconds", "type": "number", "description": "Seconds between CI status checks", "default": 300 },
+    { "name": "max_fix_attempts", "type": "number", "description": "Max auto-fix attempts before escalating to human", "default": 3 }
   ],
-  "cost_profile": { "tier": "low", "avg_tokens_per_run": 8000, "estimated_cost_usd": 0.02 },
-  "permissions": { "network": true, "filesystem": "none", "allowed_commands": ["gh run view"] },
+  "cost_profile": { "tier": "low", "avg_tokens_per_run": 15000, "estimated_cost_usd": 0.05 },
+  "permissions": { "network": true, "filesystem": "read-write", "allowed_commands": ["gh run list", "gh run view", "git commit", "git push"] },
   "agents": [
-    { "role": "poller", "prompt": "Check CI status for run {{run_id}} using `gh run view {{run_id}}`. Return: {status: 'pending'|'success'|'failure', summary: str}" },
-    { "role": "analyzer", "prompt": "Given these CI failures: {{failures}}. Identify root cause and suggest fix for each." }
+    {
+      "role": "watcher",
+      "prompt": "Check CI status for branch {{branch}} on repo {{repo}}: `gh run list --branch {{branch}} --repo {{repo}} --limit 1 --json status,conclusion,databaseId`. Return: { status: string, conclusion: string|null, run_id: string }"
+    },
+    {
+      "role": "log-extractor",
+      "condition": "watcher.conclusion == 'failure'",
+      "prompt": "Extract CI failure logs: `gh run view {{watcher.run_id}} --repo {{repo}} --log-failed`. Return: { failing_step: string, error_lines: string (max 60 lines), file_hints: string[] }"
+    },
+    {
+      "role": "fixer",
+      "condition": "watcher.conclusion == 'failure'",
+      "prompt": "Fix CI failure based on logs: {{log_extractor.error_lines}}. Focus on: {{log_extractor.file_hints}}. Apply minimal targeted fix. Then commit: `git commit -am 'fix: auto-fix CI — {{log_extractor.failing_step}}'` and `git push`. Report what changed."
+    }
   ],
-  "loop": { "poll_interval_seconds": "{{poll_interval_seconds}}", "exit_condition": "status != 'pending'", "max_polls": 20 }
+  "loop": {
+    "trigger": "scheduled",
+    "interval_seconds": "{{poll_interval_seconds}}",
+    "exit_condition": "watcher.conclusion == 'success' OR fix_attempts >= {{max_fix_attempts}}",
+    "max_rounds": 20,
+    "on_max_rounds": "escalate_to_human"
+  }
 }

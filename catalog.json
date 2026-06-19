@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "blueprints": [
+    {
+      "name": "tdd-bug-hunter",
+      "description": "Finds bugs using a TDD-driven adversarial loop",
+      "author": "SolSolis-Sys",
+      "tags": ["tdd", "bugs", "adversarial"]
+    },
+    {
+      "name": "adversarial-review",
+      "description": "Multi-perspective code review with independent refuters",
+      "author": "SolSolis-Sys",
+      "tags": ["review", "adversarial", "quality"]
+    },
+    {
+      "name": "ci-polling",
+      "description": "Polls CI status and summarizes failures",
+      "author": "SolSolis-Sys",
+      "tags": ["ci", "polling", "automation"]
+    }
+  ]
+}

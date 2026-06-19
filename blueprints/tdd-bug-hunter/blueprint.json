@@ -1,0 +1,16 @@
+{
+  "name": "tdd-bug-hunter",
+  "version": "1.0.0",
+  "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
+  "agents": [
+    { "role": "finder", "prompt": "Find one untested bug in {{target}}. Return: file, line, description, minimal repro." },
+    { "role": "test-writer", "prompt": "Write a failing test for this bug: {{bug}}. Use the project's test framework." },
+    { "role": "fixer", "prompt": "Fix the bug exposed by this test: {{test}}. Minimal change only." },
+    { "role": "verifier", "prompt": "Run the tests and verify the fix. Confirm green. If not, report what failed." }
+  ],
+  "loop": {
+    "exit_condition": "2 consecutive rounds with no new bugs found",
+    "max_rounds": 10
+  },
+  "variables": ["target"]
+}

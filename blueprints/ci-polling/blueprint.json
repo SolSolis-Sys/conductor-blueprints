@@ -1,0 +1,15 @@
+{
+  "name": "ci-polling",
+  "version": "1.0.0",
+  "description": "Polls CI run status every N seconds until done, then summarizes failures",
+  "agents": [
+    { "role": "poller", "prompt": "Check CI status for {{run_id}} using `gh run view {{run_id}}`. Return: {status: 'pending'|'success'|'failure', summary: str}" },
+    { "role": "analyzer", "prompt": "Given these CI failures: {{failures}}. Identify root cause and suggest fix for each." }
+  ],
+  "loop": {
+    "poll_interval_seconds": 30,
+    "exit_condition": "status != 'pending'",
+    "max_polls": 20
+  },
+  "variables": ["run_id"]
+}

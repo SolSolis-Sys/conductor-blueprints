@@ -26,4 +26,9 @@ conductor hub list
 
 Submit a PR with your `blueprints/<name>/blueprint.json` and add an entry to `catalog.json`.
 
+## Related
+
+- **[claude-conductor](https://github.com/SolSolis-Sys/claude-conductor)** — The orchestration plugin that runs these blueprints. Required to use `conductor hub install`.
+- **[claude-token-watch](https://github.com/SolSolis-Sys/claude-token-watch)** — Token monitoring plugin. Blueprint `cost_profile` fields reference token-watch for budget-aware orchestration.
+
 Copyright © 2026 SolSolis-Sys — MIT License

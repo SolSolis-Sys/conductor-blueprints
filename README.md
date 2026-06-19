@@ -1,6 +1,19 @@
 # conductor-blueprints
 
-Community library of reusable agent orchestration blueprints for [claude-conductor](https://github.com/SolSolis-Sys/claude-conductor).
+> Community library of reusable agent orchestration blueprints for [claude-conductor](https://github.com/SolSolis-Sys/claude-conductor).
+
+![Blueprints](https://img.shields.io/badge/blueprints-3-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+---
+
+## Available Blueprints
+
+| Name | Description | Cost tier | Tags |
+|------|-------------|-----------|------|
+| `tdd-bug-hunter` | Adversarial TDD loop: write failing test → fix → verify | medium | tdd, bugs |
+| `adversarial-review` | 3-refuter review: finding confirmed only if 2/3 fail to disprove | high | review, quality |
+| `ci-polling` | Poll CI status every 30s, summarize failures when done | low | ci, automation |
 
 ## Install a blueprint
 
@@ -8,27 +21,66 @@ Community library of reusable agent orchestration blueprints for [claude-conduct
 conductor hub install tdd-bug-hunter
 ```
 
-## Browse available blueprints
+The blueprint is saved to `~/.claude/conductor/blueprints/tdd-bug-hunter/`.
+
+## Browse and search
 
 ```bash
 conductor hub list
+conductor hub search tdd
+conductor hub info adversarial-review
 ```
 
-## Available blueprints
+## Blueprint schema
 
-| Name | Description | Tags |
-|------|-------------|------|
-| tdd-bug-hunter | Adversarial TDD loop for bug hunting | tdd, bugs |
-| adversarial-review | Multi-refuter code review | review, quality |
-| ci-polling | CI status polling and failure analysis | ci, automation |
+Each blueprint is a `blueprint.json` file with this structure:
 
-## Contributing
-
-Submit a PR with your `blueprints/<name>/blueprint.json` and add an entry to `catalog.json`.
+```json
+{
+  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "id": "author/name",
+  "name": "name",
+  "version": "1.0.0",
+  "title": "Human-readable title",
+  "description": "What this blueprint does",
+  "author": "your-github-handle",
+  "license": "MIT",
+  "tags": ["tag1", "tag2"],
+  "inputs": [
+    { "name": "target", "type": "string", "description": "...", "required": true }
+  ],
+  "cost_profile": { "tier": "low|medium|high", "avg_tokens_per_run": 10000, "estimated_cost_usd": 0.03 },
+  "permissions": { "network": false, "filesystem": "read-only", "allowed_commands": [] },
+  "agents": [
+    { "role": "finder", "prompt": "Your agent prompt here with {{variables}}" }
+  ],
+  "loop": { "exit_condition": "...", "max_rounds": 5 }
+}
+```
 
 ## Related
 
-- **[claude-conductor](https://github.com/SolSolis-Sys/claude-conductor)** — The orchestration plugin that runs these blueprints. Required to use `conductor hub install`.
-- **[claude-token-watch](https://github.com/SolSolis-Sys/claude-token-watch)** — Token monitoring plugin. Blueprint `cost_profile` fields reference token-watch for budget-aware orchestration.
+- **[claude-conductor](https://github.com/SolSolis-Sys/claude-conductor)** — the plugin that runs these blueprints
+- **[claude-token-watch](https://github.com/SolSolis-Sys/claude-token-watch)** — cost monitoring referenced by `cost_profile`
 
-Copyright © 2026 SolSolis-Sys — MIT License
+## Prompt for your AI agent
+
+```
+Please help me install a blueprint from the conductor-blueprints community library.
+1. Make sure claude-conductor is installed: https://github.com/SolSolis-Sys/claude-conductor
+2. Run: conductor hub install tdd-bug-hunter
+3. The blueprint will be available at ~/.claude/conductor/blueprints/tdd-bug-hunter/
+You can also browse available blueprints with: conductor hub list
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) to submit your own loops and workflows.
+
+---
+
+*Built with [Claude](https://claude.ai) (Anthropic) — AI pair programming.*
+
+## License
+
+MIT © [SolSolis-Sys](https://github.com/SolSolis-Sys)

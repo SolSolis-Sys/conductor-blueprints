@@ -2,7 +2,7 @@
 
 > Community library of reusable agent orchestration blueprints for [claude-conductor](https://github.com/SolSolis-Sys/claude-conductor).
 
-![Blueprints](https://img.shields.io/badge/blueprints-3-blue)
+![Blueprints](https://img.shields.io/badge/blueprints-8-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > 🌐 **Hub live** → https://solsolis-sys.github.io/conductor-blueprints/
@@ -22,6 +22,9 @@
 | `ci-polling` | Poll CI status every 30s, summarize failures when done | low | ci, automation |
 | `brainstorming-premortem` | Multi-angle idea generation + adversarial pre-mortem | high | brainstorming, planning, pre-mortem |
 | `deploy-verify` | Post-deploy health polling loop with smoke tests and optional auto-rollback | medium | deploy, verification, devops |
+| `pre-push-cohesion-check` | Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, anti-leak scrub | low | pre-push, quality, security |
+| `self-skill-improvement` | Reads a SKILL.md via deterministic tool step, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP | medium | skill, self-improvement, meta |
+| `conductor-loop-improvement` | Audits and improves the loop config of a conductor blueprint — surfaces infinite loop risks and unclear exit conditions | low | conductor, loop, meta |
 
 ## Install a blueprint
 
@@ -38,6 +41,19 @@ conductor hub list
 conductor hub search tdd
 conductor hub info adversarial-review
 ```
+
+## Submit a blueprint
+
+Found a blueprint worth sharing? Submit it to the community registry:
+
+```bash
+conductor hub submit ./my-blueprint/
+```
+
+This validates your `blueprint.json` locally and opens a GitHub Issue in this repository.
+The maintainers review and merge accepted submissions.
+
+Alternatively, [open a pull request](https://github.com/SolSolis-Sys/conductor-blueprints/pulls) directly with your `blueprints/<name>/` folder.
 
 ## Blueprint schema
 

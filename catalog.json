@@ -132,6 +132,22 @@
         "quality"
       ],
       "cost_tier": "low"
+    },
+    {
+      "id": "solfoundy/onboarding-external",
+      "name": "onboarding-external",
+      "version": "1.0.0",
+      "description": "Simulates the complete onboarding journey for an external user discovering conductor, installing blueprints, and submitting their own. Validates UX fluidity end-to-end.",
+      "author": "SolFoundy",
+      "tags": [
+        "onboarding",
+        "external",
+        "ux",
+        "validation",
+        "tool",
+        "conductor"
+      ],
+      "cost_tier": "low"
     }
   ]
 }

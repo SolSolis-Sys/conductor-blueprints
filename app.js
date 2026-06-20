@@ -282,7 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const installBtn = card.querySelector('.install-btn');
             installBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                window.open(`https://github.com/${blueprint.repo}`, '_blank', 'noopener');
+                const rawUrl = `https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/blueprints/${blueprint.name}/blueprint.json`;
+                const done = () => {
+                    installBtn.textContent = t('copied');
+                    installBtn.classList.add('copied');
+                    setTimeout(() => {
+                        installBtn.textContent = t('install');
+                        installBtn.classList.remove('copied');
+                    }, 1500);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(rawUrl).then(done).catch(() => fallbackCopy(rawUrl, done));
+                } else {
+                    fallbackCopy(rawUrl, done);
+                }
             });
 
             const voteBtn = card.querySelector('.vote-btn');
@@ -468,7 +481,21 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         modalContent.querySelector('.install-btn').addEventListener('click', () => {
-            window.open(`https://github.com/${blueprint.repo}`, '_blank', 'noopener');
+            const rawUrl = `https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/blueprints/${blueprint.name}/blueprint.json`;
+            const modalInstallBtn = modalContent.querySelector('.install-btn');
+            const done = () => {
+                modalInstallBtn.textContent = t('copied');
+                modalInstallBtn.classList.add('copied');
+                setTimeout(() => {
+                    modalInstallBtn.textContent = t('install');
+                    modalInstallBtn.classList.remove('copied');
+                }, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(rawUrl).then(done).catch(() => fallbackCopy(rawUrl, done));
+            } else {
+                fallbackCopy(rawUrl, done);
+            }
         });
         modalContent.querySelector('.vote-btn').addEventListener('click', () => {
             toggleVote(blueprint.id);

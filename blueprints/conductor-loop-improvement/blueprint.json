@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/conductor-loop-improvement",
+  "name": "conductor-loop-improvement",
+  "version": "1.0.0",
+  "title": "Conductor Loop Improvement",
+  "description": "Audits and improves the loop configuration of an existing conductor blueprint — surfaces infinite loop risks, unclear exit conditions, and inadequate max_rounds.",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["conductor", "loop", "self-improvement", "meta", "quality"],
+  "inputs": [
+    {
+      "name": "loop_config",
+      "type": "string",
+      "required": true,
+      "description": "JSON string of the loop config to audit (e.g. '{\"exit_condition\": \"done\", \"max_rounds\": 5}')"
+    },
+    {
+      "name": "blueprint_name",
+      "type": "string",
+      "required": false,
+      "default": "unknown",
+      "description": "Blueprint name for context in audit messages"
+    }
+  ],
+  "cost_profile": {
+    "tier": "low",
+    "avg_tokens_per_run": 15000,
+    "estimated_cost_usd": 0.05
+  },
+  "permissions": {
+    "network": false,
+    "filesystem": "none",
+    "allowed_commands": []
+  },
+  "agents": [
+    {
+      "role": "loop-auditor",
+      "prompt": "Audit this conductor loop configuration for blueprint '{{blueprint_name}}':\n\n{{loop_config}}\n\nCheck:\n1. exit_condition: Is it concrete and testable? (Not vague like 'when done')\n2. max_rounds: Is it set? Is the value appropriate (recommended 1-10)?\n3. trigger: Present if needed?\n4. on_success / on_failure: Defined for critical loops?\n5. Infinite loop risk: Could the exit_condition never be reached?\n\nReturn JSON:\n{\n  \"issues\": [{\"field\": \"exit_condition|max_rounds|trigger|on_success|on_failure\", \"description\": \"...\", \"severity\": \"critical|high|medium|low\", \"suggestion\": \"...\"}],\n  \"risk_score\": <0-10, where 10 = certain infinite loop>,\n  \"summary\": \"one sentence overall assessment\"\n}"
+    },
+    {
+      "role": "loop-improver",
+      "prompt": "Improve this conductor loop configuration based on the audit.\n\nOriginal config:\n{{loop_config}}\n\nAudit findings:\n{{loop-auditor.issues}}\nRisk score: {{loop-auditor.risk_score}}\n\nFix all critical and high severity issues. Keep improvements minimal and backwards-compatible.\n\nReturn JSON:\n{\n  \"improved_loop\": { <complete improved loop JSON object> },\n  \"changes\": [\"what changed and why\"]\n}"
+    },
+    {
+      "role": "synthesizer",
+      "prompt": "Make the final decision on loop improvement for '{{blueprint_name}}'.\n\nOriginal: {{loop_config}}\nRisk score: {{loop-auditor.risk_score}}\nAudit issues: {{loop-auditor.issues}}\nProposed changes: {{loop-improver.changes}}\nImproved config: {{loop-improver.improved_loop}}\n\nRules:\n- If risk_score == 0 and no critical/high issues: verdict = KEEP\n- Otherwise: verdict = IMPROVED\n\nReturn JSON:\n{\n  \"verdict\": \"IMPROVED\" | \"KEEP\",\n  \"final_loop\": { <loop config to use> },\n  \"diff_summary\": \"one sentence describing what changed\"\n}"
+    }
+  ],
+  "loop": {
+    "exit_condition": "synthesizer produced verdict",
+    "max_rounds": 1
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "blueprints": [
     {
       "id": "solsolis/tdd-bug-hunter",
@@ -36,6 +36,15 @@
       "author": "SolSolis-Sys",
       "tags": ["deploy", "verification", "health-check", "smoke-test", "devops"],
       "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/brainstorming-premortem",
+      "name": "brainstorming-premortem",
+      "version": "1.0.0",
+      "description": "Multi-angle idea generation followed by adversarial pre-mortem: surfaces risks before committing to a plan",
+      "author": "SolSolis-Sys",
+      "tags": ["brainstorming", "planning", "pre-mortem", "risk-analysis", "decision-making"],
+      "cost_tier": "medium"
     }
   ]
 }

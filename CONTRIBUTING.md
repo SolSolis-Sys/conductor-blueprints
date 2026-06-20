@@ -17,10 +17,12 @@ cd conductor-blueprints
 blueprints/
 └── your-name/
     ├── blueprint.json   # required
-    └── README.md        # recommended
+    └── README.md        # required (see docs/CREATE-BLUEPRINT.md §Step 6)
 ```
 
 Use the naming format: `what-it-does` (lowercase, hyphens, no spaces).
+
+> **New to blueprints?** Follow the complete step-by-step tutorial in [docs/CREATE-BLUEPRINT.md](docs/CREATE-BLUEPRINT.md) — it walks you through an annotated real example from scratch.
 
 ### 3. Write your blueprint.json
 
@@ -28,7 +30,7 @@ Use this template:
 
 ```json
 {
-  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
   "id": "your-github-handle/your-blueprint-name",
   "name": "your-blueprint-name",
   "version": "1.0.0",

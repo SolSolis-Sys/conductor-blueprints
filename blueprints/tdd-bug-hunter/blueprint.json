@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
   "id": "solsolis/tdd-bug-hunter",
   "name": "tdd-bug-hunter",
   "version": "1.0.0",

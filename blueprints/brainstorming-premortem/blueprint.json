@@ -1,0 +1,50 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/brainstorming-premortem",
+  "name": "brainstorming-premortem",
+  "version": "1.0.0",
+  "title": "Brainstorming + Pre-mortem Analysis",
+  "description": "Multi-angle idea generation followed by adversarial pre-mortem: surfaces risks before committing to a plan.",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["brainstorming", "planning", "pre-mortem", "risk-analysis", "decision-making"],
+  "inputs": [
+    { "name": "topic", "type": "string", "description": "The plan, idea, or decision to analyze", "required": true },
+    { "name": "constraints", "type": "string", "description": "Known constraints (time, budget, team, tech)", "default": "none specified" },
+    { "name": "horizon", "type": "string", "description": "Evaluation horizon (e.g. '1 week', '3 months')", "default": "3 months" },
+    { "name": "premortem_analyst_count", "type": "number", "description": "Number of parallel pre-mortem analysts (one per failure category)", "default": 5 }
+  ],
+  "cost_profile": { "tier": "medium", "avg_tokens_per_run": 55000, "estimated_cost_usd": 0.17 },
+  "permissions": { "network": false, "filesystem": "none", "allowed_commands": [] },
+  "agents": [
+    {
+      "role": "ideator-nominal",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: NOMINAL — the obvious, natural approach. Generate 3-5 concrete ideas. No filtering.\nReturn JSON: { \"angle\": \"nominal\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "role": "ideator-alternative",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: ALTERNATIVE — the opposite or radically different approach. What if you did the reverse?\nReturn JSON: { \"angle\": \"alternative\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "role": "ideator-constrained",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: SEVERE CONSTRAINTS — half the time, 10% budget, minimal team. Absolute MVP only.\nReturn JSON: { \"angle\": \"constrained\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "role": "ideator-future",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: FUTURE REGRET — in 1 year, what will you wish you had done now? What short-term thinking will you regret?\nReturn JSON: { \"angle\": \"future\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "role": "premortem-analyst",
+      "count": "{{premortem_analyst_count}}",
+      "prompt": "Pre-mortem for: {{topic}}\nIt is 6 months from now. The plan failed.\nYour assigned failure category (by instance index 0-4): technical | user | platform | dependencies | scope\nFrom your category's perspective, what went wrong?\nReturn JSON: { \"category\": \"\", \"risks\": [{\"description\": \"\", \"probability\": \"high|medium|low\", \"impact\": \"critical|moderate|minor\", \"mitigation\": \"\"}] }"
+    },
+    {
+      "role": "synthesizer",
+      "prompt": "Synthesize brainstorming and pre-mortem for: {{topic}}\n\nIdeas collected:\n- Nominal: {{ideator-nominal.ideas}}\n- Alternative: {{ideator-alternative.ideas}}\n- Constrained: {{ideator-constrained.ideas}}\n- Future: {{ideator-future.ideas}}\n\nRisks from pre-mortem: {{premortem-analyst.risks}}\n\nProduce:\n1. top_ideas: best 2-3 ideas with rationale\n2. critical_risks: top 3 risks with mitigations\n3. unknowns: what we don't know yet\n4. success_criterion: one measurable signal of success\n5. mvp_if_halved: scope if time is cut in half\n6. verdict: READY_TO_PLAN | NEEDS_INVESTIGATION | STOP\n7. verdict_reason: one sentence"
+    }
+  ],
+  "loop": {
+    "exit_condition": "synthesizer produced verdict",
+    "max_rounds": 1
+  }
+}

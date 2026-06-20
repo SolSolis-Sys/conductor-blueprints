@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Conductor Blueprint Schema v1",
+  "description": "Schema for claude-conductor blueprint.json files. NOTE: hub.js enforces only 'name', 'version', 'agents' — all other fields are validated by this schema for IDE support and contributor guidance only.",
+  "type": "object",
+  "required": ["name", "version", "agents"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Must point to https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+      "description": "Namespaced identifier: 'github-handle/blueprint-name'"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Blueprint name in kebab-case"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (semver)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title"
+    },
+    "description": {
+      "type": "string",
+      "description": "One sentence: what does this blueprint do?"
+    },
+    "author": {
+      "type": "string",
+      "description": "GitHub handle of the author"
+    },
+    "license": {
+      "type": "string",
+      "enum": ["MIT", "Apache-2.0", "GPL-3.0", "BSD-2-Clause", "BSD-3-Clause"],
+      "description": "SPDX license identifier"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Relevant tags for discoverability"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "boolean"] },
+          "description": { "type": "string" },
+          "required": { "type": "boolean" },
+          "default": {}
+        }
+      },
+      "description": "User-provided inputs. Reference in prompts as {{input_name}}"
+    },
+    "cost_profile": {
+      "type": "object",
+      "properties": {
+        "tier": { "type": "string", "enum": ["low", "medium", "high"] },
+        "avg_tokens_per_run": { "type": "number", "minimum": 100, "maximum": 500000 },
+        "estimated_cost_usd": { "type": "number", "minimum": 0 }
+      },
+      "description": "Cost estimation. Formula: agents × ~10k tokens × $0.003/1k ≈ cost"
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "network": { "type": "boolean" },
+        "filesystem": { "type": "string", "enum": ["none", "read-only", "read-write"] },
+        "allowed_commands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Shell commands allowed. NEVER include destructive commands (rm -rf, del, format)"
+        }
+      },
+      "description": "Minimum permissions required. Default to most restrictive."
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role", "prompt"],
+        "properties": {
+          "role": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "prompt": {
+            "type": "string",
+            "description": "Use {{input_name}} for inputs, {{agent-role.field}} for previous agent outputs"
+          },
+          "count": {
+            "description": "Number of parallel instances. Use a number or {{input_name}} for dynamic count."
+          },
+          "condition": {
+            "type": "string",
+            "description": "Execute this agent only if condition is true. E.g.: 'previous-agent.status == \"failure\"'"
+          }
+        }
+      },
+      "description": "Agent roles. Inter-agent variables: {{role-name.field}} references output from that role."
+    },
+    "loop": {
+      "type": "object",
+      "properties": {
+        "exit_condition": {
+          "type": "string",
+          "description": "Concrete, testable condition for loop termination. Must be reachable."
+        },
+        "max_rounds": {
+          "description": "Safety cap. Recommended: 1-10. Use {{input_name}} for user-configurable cap.",
+          "maximum": 100
+        },
+        "trigger": { "type": "string" },
+        "on_success": { "type": "string" },
+        "on_failure": { "type": "string" }
+      },
+      "description": "Loop control. Always set max_rounds to prevent infinite loops."
+    }
+  },
+  "additionalProperties": true
+}

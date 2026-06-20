@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/pre-push-cohesion-check",
+  "name": "pre-push-cohesion-check",
+  "version": "1.0.0",
+  "title": "Multi-Repo Cohesion Check Before Push",
+  "description": "Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, scrub anti-leak",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["pre-push", "quality", "cohesion", "oss", "security", "scrub"],
+  "inputs": [
+    {
+      "name": "repos",
+      "type": "string",
+      "description": "Comma-separated list of repo names to check (e.g. claude-relay,conductor-blueprints)",
+      "required": true
+    },
+    {
+      "name": "scrub_patterns",
+      "type": "string",
+      "description": "Additional private patterns to grep for (comma-separated), beyond the default set",
+      "default": "SolSolis-Sys private terms"
+    }
+  ],
+  "cost_profile": {
+    "tier": "low",
+    "avg_tokens_per_run": 15000,
+    "estimated_cost_usd": 0.05
+  },
+  "permissions": {
+    "network": false,
+    "filesystem": "read-only",
+    "allowed_commands": ["git", "grep"]
+  },
+  "agents": [
+    {
+      "role": "structure-auditor",
+      "count": 1,
+      "prompt": "For each repo in {{repos}}, verify that these files exist at the repository root: README.md, CHANGELOG.md, LICENSE, .gitignore. Exclude venv/ node_modules/ __pycache__ .git from any filesystem traversal. For each repo, return: { repo: string, missing_files: string[], status: \"ok\" | \"missing\" }. If any file is missing, flag status as \"missing\" and list which ones."
+    },
+    {
+      "role": "schema-validator",
+      "prompt": "Check version consistency across the repos in {{repos}}. For each repo that contains a blueprint.json, compare its top-level version field against the corresponding entry in catalog.json. A mismatch means the catalog entry is out of sync with the blueprint source. Exclude venv/ node_modules/ __pycache__ .git from any search. Return: { mismatches: [{repo: string, blueprint_version: string, catalog_version: string}], status: \"ok\" | \"mismatch\" }"
+    },
+    {
+      "role": "scrub-checker",
+      "prompt": "Scan the repos in {{repos}} for private or sensitive content that must not appear in a public OSS push. Check for: hardcoded private IP addresses (e.g. 192.168.x.x, 10.x.x.x, 100.x.x.x Tailscale ranges), internal agent IDs matching pattern [0-9]-[A-Z]{3}[0-9]{3}, session reference numbers matching pattern S[0-9]{3}, the extra patterns in {{scrub_patterns}}. Exclude venv/ node_modules/ __pycache__ .git from grep. For each match, report: { repo: string, file: string, line: number, pattern: string, snippet: string }. Return: { leaks: [...], status: \"clean\" | \"leaked\" }"
+    },
+    {
+      "role": "gate-decision",
+      "prompt": "Given the outputs from structure-auditor, schema-validator, and scrub-checker, produce a final push verdict.\n\nInputs:\n- Structure audit: {{structure-auditor.status}} — missing: {{structure-auditor.missing_files}}\n- Schema sync: {{schema-validator.status}} — mismatches: {{schema-validator.mismatches}}\n- Scrub: {{scrub-checker.status}} — leaks: {{scrub-checker.leaks}}\n\nVerdict rules:\n- BLOCK_PUSH if scrub-checker.status == \"leaked\" (data leak is always blocking)\n- BLOCK_PUSH if structure-auditor is missing LICENSE or README.md (non-negotiable OSS hygiene)\n- WARN_ONLY if schema-validator.status == \"mismatch\" (desync is a warning, not a blocker)\n- WARN_ONLY if structure-auditor is missing CHANGELOG.md or .gitignore only\n- PASS_PUSH if all checks are clean\n\nReturn: { verdict: \"PASS_PUSH\" | \"WARN_ONLY\" | \"BLOCK_PUSH\", reasons: string[], recommended_actions: string[] }"
+    }
+  ],
+  "loop": {
+    "exit_condition": "gate-decision outputs verdict",
+    "max_rounds": 1
+  }
+}

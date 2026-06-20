@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "blueprints": [
     {
       "id": "solsolis/tdd-bug-hunter",
@@ -45,6 +45,15 @@
       "author": "SolSolis-Sys",
       "tags": ["brainstorming", "planning", "pre-mortem", "risk-analysis", "decision-making"],
       "cost_tier": "medium"
+    },
+    {
+      "id": "solsolis/pre-push-cohesion-check",
+      "name": "pre-push-cohesion-check",
+      "version": "1.0.0",
+      "description": "Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, scrub anti-leak",
+      "author": "SolSolis-Sys",
+      "tags": ["pre-push", "quality", "cohesion", "oss", "security", "scrub"],
+      "cost_tier": "low"
     }
   ]
 }

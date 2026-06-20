@@ -18,6 +18,8 @@
 | `tdd-bug-hunter` | Adversarial TDD loop: write failing test → fix → verify | medium | tdd, bugs |
 | `adversarial-review` | 3-refuter review: finding confirmed only if 2/3 fail to disprove | high | review, quality |
 | `ci-polling` | Poll CI status every 30s, summarize failures when done | low | ci, automation |
+| `brainstorming-premortem` | Multi-angle idea generation + adversarial pre-mortem | high | brainstorming, planning, pre-mortem |
+| `deploy-verify` | Post-deploy health polling loop with smoke tests and optional auto-rollback | medium | deploy, verification, devops |
 
 ## Install a blueprint
 
@@ -41,7 +43,7 @@ Each blueprint is a `blueprint.json` file with this structure:
 
 ```json
 {
-  "$schema": "https://schemas.solsolis.dev/conductor/blueprint.v1.json",
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
   "id": "author/name",
   "name": "name",
   "version": "1.0.0",

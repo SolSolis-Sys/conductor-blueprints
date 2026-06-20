@@ -147,6 +147,47 @@ Here is a complete, annotated example using `brainstorming-premortem`:
 
 ---
 
+## Step 3b — Deterministic Tool Steps (optional)
+
+Instead of an LLM agent, a step can execute a Node.js script deterministically — zero tokens, no LLM call.
+
+Use `type: "tool"` in the `agents[]` array:
+
+```json
+{
+  "role": "file-reader",
+  "type": "tool",
+  "command": "node conductor://tools/read-file {{skill_path}}",
+  "output_var": "skill_content",
+  "timeout_ms": 5000,
+  "on_failure": "abort"
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `type` | yes | `"tool"` (omit for LLM agents) |
+| `command` | yes | Shell command. Use `conductor://tools/<script>` for built-in scripts |
+| `output_var` | no | Variable name for stdout — accessible as `{{output_var}}` in subsequent agent prompts |
+| `timeout_ms` | no | Timeout in ms (default: 10 000) |
+| `on_failure` | no | `"abort"` (default) or `"continue"` |
+
+### Built-in tool scripts
+
+| conductor://tools/ | Description |
+|--------------------|-------------|
+| `read-file <path>` | Reads file at path, outputs content to stdout |
+| `validate-schema <path>` | Validates blueprint.json, outputs `{valid, errors}` JSON |
+| `git-status [dir]` | Compact git status JSON: `{branch, staged, modified, untracked, clean}` |
+
+### When to use tool steps
+
+- Reading files before LLM analysis (avoids injecting file content in every agent prompt)
+- Checking environment state deterministically (git, schema validity)
+- Any operation where a shell script is cheaper and more reliable than an LLM
+
+---
+
 ## Step 4 — Validate locally
 
 ```bash

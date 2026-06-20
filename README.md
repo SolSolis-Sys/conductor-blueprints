@@ -1,27 +1,21 @@
-# conductor-blueprints
+# Conductor Blueprints
 
-> Community library of reusable agent orchestration blueprints for [claude-conductor](https://github.com/SolSolis-Sys/claude-conductor).
+**Stop reinventing your agent workflows. Browse, install, and share battle-tested orchestration patterns.**
+
+You've already solved a complex multi-agent problem — a TDD loop, a pre-push review, a deploy verifier. So has someone else. This is the place where those patterns live, ready to use in 30 seconds.
 
 ![Blueprints](https://img.shields.io/badge/blueprints-8-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-> 🌐 **Hub live** → https://solsolis-sys.github.io/conductor-blueprints/
-
-> ⚠️ **Alpha — work in progress. Use at your own risk.** Expect rough edges. Found a bug or have a suggestion? Please [open an issue]
-
-> **Not affiliated with Anthropic.** This is an independent, unofficial tool — not a product of or endorsed by Anthropic.
+> Not affiliated with Anthropic. Independent, unofficial project.
 
 ---
 
-## Install a blueprint
+## Browse Blueprints
 
-```bash
-conductor hub install tdd-bug-hunter
-```
+**Hub live:** https://solsolis-sys.github.io/conductor-blueprints/
 
-The blueprint is saved to `~/.claude/conductor/blueprints/tdd-bug-hunter/`.
-
-## Browse and search
+Categories available: `tdd` · `review` · `planning` · `ci` · `deploy` · `security` · `meta`
 
 ```bash
 conductor hub list
@@ -29,84 +23,87 @@ conductor hub search tdd
 conductor hub info adversarial-review
 ```
 
-## Submit a blueprint
+---
 
-Found a blueprint worth sharing? Submit it to the community registry:
+## Quick Start
+
+Pick a blueprint, install it, run it — that's the whole flow.
+
+```bash
+conductor hub install tdd-bug-hunter
+```
+
+The blueprint lands in `~/.claude/conductor/blueprints/tdd-bug-hunter/` and is immediately available to [claude-conductor](https://github.com/SolSolis-Sys/claude-conductor).
+
+---
+
+## Featured Blueprints
+
+### `tdd-bug-hunter` — Catch bugs before they ship
+Adversarial TDD loop: one agent writes the failing test, another fixes the code, a third verifies. Keeps looping until the suite goes dry. Cost: medium.
+
+### `adversarial-review` — Code review that actually argues back
+Three independent reviewers refute each other's findings. Only what survives 2-of-3 rejection gets reported. No more false positives cluttering your PR. Cost: high.
+
+### `idea-to-spec` — Raw idea in, structured spec out
+Research, integration analysis, and validation in one run. Turns a vague feature request into something your team can actually act on. Cost: medium.
+
+### `brainstorming-premortem` — Kill bad ideas before you build them
+Multi-angle ideation followed by an adversarial pre-mortem. Surfaces the fatal flaws while it's still cheap to pivot. Cost: high.
+
+### `deploy-verify` — Know your deploy worked before you close the tab
+Post-deploy health polling loop with smoke tests and optional auto-rollback. Beats checking logs manually for the fifth time. Cost: medium.
+
+---
+
+## Submit a Blueprint
+
+If you built a workflow worth sharing, it belongs here.
 
 ```bash
 conductor hub submit ./my-blueprint/
 ```
 
-This validates your `blueprint.json` locally and opens a GitHub Issue in this repository.
-The maintainers review and merge accepted submissions.
+This validates your `blueprint.json` locally and opens a GitHub Issue. Maintainers review and merge accepted submissions — usually within a few days.
 
-Alternatively, [open a pull request](https://github.com/SolSolis-Sys/conductor-blueprints/pulls) directly with your `blueprints/<name>/` folder.
+Prefer PRs? Drop your `blueprints/<name>/` folder directly: [open a pull request](https://github.com/SolSolis-Sys/conductor-blueprints/pulls).
 
-## Blueprint schema
+**What makes a good blueprint:** a workflow you've run more than once, a clear exit condition, a realistic cost estimate. That's it.
 
-Each blueprint is a `blueprint.json` file with this structure:
+---
 
-```json
-{
-  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
-  "id": "author/name",
-  "name": "name",
-  "version": "1.0.0",
-  "title": "Human-readable title",
-  "description": "What this blueprint does",
-  "author": "your-github-handle",
-  "license": "MIT",
-  "tags": ["tag1", "tag2"],
-  "inputs": [
-    { "name": "target", "type": "string", "description": "...", "required": true }
-  ],
-  "cost_profile": { "tier": "low|medium|high", "avg_tokens_per_run": 10000, "estimated_cost_usd": 0.03 },
-  "permissions": { "network": false, "filesystem": "read-only", "allowed_commands": [] },
-  "agents": [
-    { "role": "finder", "prompt": "Your agent prompt here with {{variables}}" }
-  ],
-  "loop": { "exit_condition": "...", "max_rounds": 5 }
-}
-```
+## Contributing
+
+Step-by-step guide, schema reference, and security checklist: [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+**Blueprint ideas the community would love to see:**
+- Framework migration loops (JS to TS, REST to GraphQL)
+- Documentation generator from code
+- Dependency audit and upgrade loop
+- Accessibility audit (WCAG)
+
+---
 
 ## Related
 
 - **[claude-conductor](https://github.com/SolSolis-Sys/claude-conductor)** — the plugin that runs these blueprints
 - **[claude-token-watch](https://github.com/SolSolis-Sys/claude-token-watch)** — cost monitoring referenced by `cost_profile`
 
-## Prompt for your AI agent
-
-```
-Please help me install a blueprint from the conductor-blueprints community library.
-1. Make sure claude-conductor is installed: https://github.com/SolSolis-Sys/claude-conductor
-2. Run: conductor hub install tdd-bug-hunter
-3. The blueprint will be available at ~/.claude/conductor/blueprints/tdd-bug-hunter/
-You can also browse available blueprints with: conductor hub list
-```
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) to submit your own loops and workflows.
-
----
-
-*Built with [Claude](https://claude.ai) (Anthropic) — AI pair programming.*
-
-## License
-
-MIT © [SolSolis-Sys](https://github.com/SolSolis-Sys)
-
 ---
 
 ## Blueprint Catalog
 
-| Name | Description | Cost tier | Tags |
-|------|-------------|-----------|------|
+| Name | What it does | Cost | Tags |
+|------|-------------|------|------|
+| `idea-to-spec` | Raw idea → structured feature spec with research and validation | medium | planning, spec |
 | `tdd-bug-hunter` | Adversarial TDD loop: write failing test → fix → verify | medium | tdd, bugs |
 | `adversarial-review` | 3-refuter review: finding confirmed only if 2/3 fail to disprove | high | review, quality |
-| `ci-polling` | Poll CI status every 30s, summarize failures when done | low | ci, automation |
-| `brainstorming-premortem` | Multi-angle idea generation + adversarial pre-mortem | high | brainstorming, planning, pre-mortem |
-| `deploy-verify` | Post-deploy health polling loop with smoke tests and optional auto-rollback | medium | deploy, verification, devops |
-| `pre-push-cohesion-check` | Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, anti-leak scrub | low | pre-push, quality, security |
-| `self-skill-improvement` | Reads a SKILL.md via deterministic tool step, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP | medium | skill, self-improvement, meta |
-| `conductor-loop-improvement` | Audits and improves the loop config of a conductor blueprint — surfaces infinite loop risks and unclear exit conditions | low | conductor, loop, meta |
+| `ci-polling` | Poll CI, extract failures, auto-fix, loop until green | low | ci, automation |
+| `brainstorming-premortem` | Multi-angle ideation + adversarial pre-mortem | high | brainstorming, planning |
+| `deploy-verify` | Post-deploy health polling with smoke tests and optional auto-rollback | medium | deploy, devops |
+| `pre-push-cohesion-check` | Cross-repo consistency check before pushing: README, CHANGELOG, schemas, anti-leak scrub | low | pre-push, security |
+| `self-skill-improvement` | Reads a SKILL.md, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP | medium | skill, meta |
+
+---
+
+MIT © [SolSolis-Sys](https://github.com/SolSolis-Sys)

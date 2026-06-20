@@ -88,23 +88,49 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["role", "prompt"],
+        "required": ["role"],
         "properties": {
           "role": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "type": {
+            "type": "string",
+            "enum": ["agent", "tool"],
+            "default": "agent",
+            "description": "Step type. 'agent' (default) = LLM call. 'tool' = deterministic command, no LLM."
+          },
           "prompt": {
             "type": "string",
-            "description": "Use {{input_name}} for inputs, {{agent-role.field}} for previous agent outputs"
+            "description": "For agent steps: instruction. Supports {{input_name}} and {{role.field}} interpolation."
+          },
+          "command": {
+            "type": "string",
+            "description": "For tool steps: shell command or built-in tool. Supports {{input_name}} interpolation. Built-ins: conductor://tools/read-file, conductor://tools/validate-schema, conductor://tools/git-status."
+          },
+          "timeout_ms": {
+            "type": "number",
+            "minimum": 100,
+            "maximum": 300000,
+            "description": "For tool steps: max execution time in ms. Default: 5000."
+          },
+          "on_failure": {
+            "type": "string",
+            "enum": ["abort", "continue", "retry"],
+            "description": "For tool steps: behavior on non-zero exit. Default: 'abort'."
+          },
+          "output_var": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "For tool steps: captures stdout as a named variable. Reference in later steps as {{output_var}}."
           },
           "count": {
-            "description": "Number of parallel instances. Use a number or {{input_name}} for dynamic count."
+            "description": "For agent steps: number of parallel instances. Use a number or {{input_name}} for dynamic count."
           },
           "condition": {
             "type": "string",
-            "description": "Execute this agent only if condition is true. E.g.: 'previous-agent.status == \"failure\"'"
+            "description": "Execute this step only if condition is true. E.g.: 'previous-agent.status == \"failure\"'"
           }
         }
       },
-      "description": "Agent roles. Inter-agent variables: {{role-name.field}} references output from that role."
+      "description": "Ordered steps: 'agent' (LLM) or 'tool' (deterministic). Mix freely. Variables: {{role-name.field}} or {{output_var}} from tool steps."
     },
     "loop": {
       "type": "object",

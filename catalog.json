@@ -1,6 +1,15 @@
 {
-  "version": "1.4.0",
+  "version": "1.6.0",
   "blueprints": [
+    {
+      "id": "0-hyp004/idea-to-spec",
+      "name": "idea-to-spec",
+      "version": "1.0.0",
+      "description": "Transform a raw idea into a formal NOÛS specification (N12 ticket format) with research, cross-module analysis, and validation.",
+      "author": "0-HYP004",
+      "tags": ["planning", "spec", "idea-to-spec", "nous", "ticket", "N12"],
+      "cost_tier": "medium"
+    },
     {
       "id": "solsolis/tdd-bug-hunter",
       "name": "tdd-bug-hunter",
@@ -53,6 +62,24 @@
       "description": "Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, scrub anti-leak",
       "author": "SolSolis-Sys",
       "tags": ["pre-push", "quality", "cohesion", "oss", "security", "scrub"],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/self-skill-improvement",
+      "name": "self-skill-improvement",
+      "version": "1.0.0",
+      "description": "Reads a SKILL.md via deterministic tool step, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP",
+      "author": "SolSolis-Sys",
+      "tags": ["skill", "self-improvement", "quality", "claude-code", "meta"],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solsolis/conductor-loop-improvement",
+      "name": "conductor-loop-improvement",
+      "version": "1.0.0",
+      "description": "Audits and improves the loop configuration of an existing conductor blueprint — surfaces infinite loop risks and unclear exit conditions",
+      "author": "SolSolis-Sys",
+      "tags": ["conductor", "loop", "self-improvement", "meta", "quality"],
       "cost_tier": "low"
     }
   ]

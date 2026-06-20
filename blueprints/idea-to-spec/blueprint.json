@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "0-hyp004/idea-to-spec",
+  "name": "idea-to-spec",
+  "version": "1.0.0",
+  "title": "Idea → Formal NOÛS Spec (N12 Ticket)",
+  "description": "Transform a raw idea into a formal NOÛS specification (N12 ticket format) with research, cross-module analysis, and validation.",
+  "author": "0-HYP004",
+  "license": "MIT",
+  "tags": ["planning", "spec", "idea-to-spec", "nous", "ticket", "N12"],
+  "inputs": [
+    {
+      "name": "idea",
+      "type": "string",
+      "description": "Raw idea or proposal (problem statement, vision, or feature concept)",
+      "required": true
+    },
+    {
+      "name": "project",
+      "type": "string",
+      "description": "NOÛS project code (e.g., 'NOWS', 'RELAY', 'CONDUCTOR')",
+      "required": true
+    },
+    {
+      "name": "module",
+      "type": "string",
+      "description": "Target module (e.g., 'MEMORY', 'LOOPER', 'GATES')",
+      "required": true
+    },
+    {
+      "name": "priority",
+      "type": "number",
+      "description": "Priority level (1-5, 1=critical)",
+      "default": 3
+    },
+    {
+      "name": "context",
+      "type": "string",
+      "description": "Additional context (constraints, dependencies, background)",
+      "default": "none specified"
+    }
+  ],
+  "cost_profile": {
+    "tier": "medium",
+    "avg_tokens_per_run": 42000,
+    "estimated_cost_usd": 0.13
+  },
+  "permissions": {
+    "network": false,
+    "filesystem": "none",
+    "allowed_commands": []
+  },
+  "agents": [
+    {
+      "role": "idea-extractor",
+      "prompt": "Extract and clarify the raw idea.\n\nIdea: {{idea}}\nProject: {{project}}\nModule: {{module}}\nContext: {{context}}\n\nYour task:\n1. Restate the idea in one sentence (core value proposition)\n2. Identify 3-5 key constraints or assumptions\n3. List known adjacent modules or related features\n4. Identify gaps or unknowns\n5. Suggest 1-2 keywords (KeyKey format, e.g. 'CMEM', 'LOOPER-SYNC')\n\nReturn JSON: { \"title\": \"\", \"one_liner\": \"\", \"key_assumptions\": [], \"adjacent_modules\": [], \"unknowns\": [], \"suggested_keykey\": [] }"
+    },
+    {
+      "role": "spec-researcher",
+      "prompt": "Research related NOÛS specs and existing tickets.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nAdjacent modules: {{idea-extractor.adjacent_modules}}\nProject: {{project}}\n\nYour task (simulate search across NOÛS N12 ticket database):\n1. List 3-5 related existing tickets (format: T-PROJECT-MODULE-NN)\n2. For each ticket, explain how it relates (convergence, conflict, or independent)\n3. Flag any open PRs or in-progress work that might affect this idea\n4. Suggest a unique ticket ID for this spec (T-{{project}}-{{module}}-NN)\n5. Identify any blocking or prerequisite tickets\n\nReturn JSON: { \"related_tickets\": [{\"id\": \"\", \"relation\": \"convergence|conflict|independent\", \"explanation\": \"\"}], \"suggested_ticket_id\": \"\", \"blockers\": [], \"in_progress_related\": [] }"
+    },
+    {
+      "role": "cross-analyzer",
+      "prompt": "Analyze convergence with NOÛS core modules.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nRelated tickets: {{spec-researcher.related_tickets}}\n\nCore NOÛS modules to check for convergence:\n1. Looper (T-LOOPER-0) — triangulation graph, KeyKey indexing, navigation\n2. Gates (T-GATES-0) — permission model, P-GATES protocol\n3. Runner (T-RUNNER-0) — agent dispatch, subagent threading\n4. Memory (T-MEMORY-0) — session state, vault archiving\n5. NOS (T-NOS-0) — spec registry, tool exposure\n\nYour task:\n1. For each core module, identify 1-2 points of convergence\n2. Suggest how this idea could integrate with or leverage each module\n3. Flag any contradictions with existing architecture\n4. Propose \"KeyKey + Strate + Gravité\" profile for Looper integration\n5. Recommend a Livre Blanc chapter reference (format: \"N.NN\")\n\nReturn JSON: { \"convergence\": [{\"module\": \"\", \"points\": [], \"integration_suggestion\": \"\"}], \"architecture_contradictions\": [], \"looper_profile\": {\"keykey\": \"\", \"strate\": 0, \"gravite_threshold\": 0.8}, \"livre_blanc_chapter\": \"\" }"
+    },
+    {
+      "role": "spec-drafter",
+      "prompt": "Draft a formal NOÛS N12 ticket specification.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nOne-liner: {{idea-extractor.one_liner}}\nSuggested ID: {{spec-researcher.suggested_ticket_id}}\nProject: {{project}}\nModule: {{module}}\nPriority: {{priority}}\nKeyKey: {{cross-analyzer.looper_profile.keykey}}\nConvergence analysis: {{cross-analyzer.convergence}}\nLivre Blanc: {{cross-analyzer.livre_blanc_chapter}}\n\nYour task: Produce a complete NOÛS N12 ticket specification.\n\nFormat:\n```\nid: [suggested_ticket_id]\ntitle: [clear title]\nstatut: draft\npriorite: [priority]\nprojet: [project]\nassignee: \"\"\ntags: [relevant tags]\nkeykey: [{{cross-analyzer.looper_profile.keykey}}]\nlien_lb: [{{cross-analyzer.livre_blanc_chapter}}]\nparent: [[T-...-0]] (if applicable)\nlien_croise: [[T-...], [T-...]] (from spec-researcher.related_tickets)\n\nDONE-WHEN:\n[List 2-3 concrete, measurable acceptance criteria]\n\nCONTEXTE:\n[2-3 sentences: why this matters, business value]\n\nARCHITECTURE:\n[Key design decisions, module interactions, data structures]\n\nDÉPENDANCES:\n[Blocking tickets, required integrations]\n\nDÉCISIONS:\n[Open questions to resolve before implementation]\n```\n\nReturn plain text (code block format)."
+    },
+    {
+      "role": "spec-validator",
+      "prompt": "Validate the drafted specification against NOÛS architecture principles.\n\nDrafted spec:\n{{spec-drafter}}\n\nValidation checklist:\n1. Ticket ID follows T-PROJECT-MODULE-NN format? ✓/✗\n2. Title is clear and specific? ✓/✗\n3. DONE-WHEN criteria are measurable? ✓/✗\n4. CONTEXTE explains the \"why\"? ✓/✗\n5. ARCHITECTURE describes module interactions? ✓/✗\n6. DÉPENDANCES identifies blockers? ✓/✗\n7. DÉCISIONS lists open questions? ✓/✗\n8. KeyKey is indexed in Looper profile? ✓/✗\n9. Related tickets are cross-referenced? ✓/✗\n10. No contradictions with existing core modules? ✓/✗\n\nYour task:\n1. For each failing check, suggest a correction\n2. Score coherence (1-10) — how well does this spec fit NOÛS architecture?\n3. Flag any risks (architectural, scheduling, scope creep)\n4. Recommend ACCEPT or ITERATE\n5. If ITERATE, list required revisions\n\nReturn JSON: { \"validation_checks\": {\"check_name\": \"✓|✗|?\", \"feedback\": \"\"}, \"coherence_score\": 0-10, \"risks\": [], \"recommendation\": \"ACCEPT|ITERATE\", \"revisions_required\": [] }"
+    }
+  ],
+  "loop": {
+    "exit_condition": "spec-validator produced ACCEPT recommendation",
+    "max_rounds": 2
+  }
+}

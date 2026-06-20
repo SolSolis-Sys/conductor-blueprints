@@ -1,5 +1,7 @@
 # Conductor Blueprints
 
+[![CI](https://github.com/SolSolis-Sys/conductor-blueprints/actions/workflows/ci.yml/badge.svg)](https://github.com/SolSolis-Sys/conductor-blueprints/actions/workflows/ci.yml)
+
 **Stop reinventing your agent workflows. Browse, install, and share battle-tested orchestration patterns.**
 
 You've already solved a complex multi-agent problem — a TDD loop, a pre-push review, a deploy verifier. So has someone else. This is the place where those patterns live, ready to use in 30 seconds.

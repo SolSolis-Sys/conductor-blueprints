@@ -1,0 +1,22 @@
+{
+  "name": "conductor-blueprints",
+  "version": "1.6.0",
+  "description": "Stop reinventing your agent workflows. Browse, install, and share battle-tested orchestration patterns.",
+  "scripts": {
+    "test": "node scripts/validate.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SolSolis-Sys/conductor-blueprints.git"
+  },
+  "keywords": [
+    "conductor",
+    "blueprints",
+    "agent",
+    "orchestration",
+    "workflow",
+    "claude"
+  ],
+  "author": "SolSolis-Sys",
+  "license": "MIT"
+}

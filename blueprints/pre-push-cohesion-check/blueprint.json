@@ -44,7 +44,7 @@
     },
     {
       "role": "scrub-checker",
-      "prompt": "Scan the repos in {{repos}} for private or sensitive content that must not appear in a public OSS push. Check for: hardcoded private IP addresses (e.g. 192.168.x.x, 10.x.x.x, 100.x.x.x Tailscale ranges), internal agent IDs matching pattern [0-9]-[A-Z]{3}[0-9]{3}, session reference numbers matching pattern S[0-9]{3}, the extra patterns in {{scrub_patterns}}. Exclude venv/ node_modules/ __pycache__ .git from grep. For each match, report: { repo: string, file: string, line: number, pattern: string, snippet: string }. Return: { leaks: [...], status: \"clean\" | \"leaked\" }"
+      "prompt": "Scan the repos in {{repos}} for private or sensitive content that must not appear in a public OSS push. Check for: hardcoded private IP addresses (e.g. 192.168.x.x, 10.x.x.x, 100.x.x.x Tailscale ranges), internal reference identifiers, session reference numbers, the extra patterns in {{scrub_patterns}}. Exclude venv/ node_modules/ __pycache__ .git from grep. For each match, report: { repo: string, file: string, line: number, pattern: string, snippet: string }. Return: { leaks: [...], status: \"clean\" | \"leaked\" }"
     },
     {
       "role": "gate-decision",

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] — 2026-06-21
+
+### Added
+- Blueprint `fetch-web` : RAG-first golden flux (6 agents : rag-checker, rag-content-scanner, rag-evaluator, fetcher, synthesizer, rag-writer). Fetch conditionnel uniquement si confiance RAG ≤ 0.8.
+- 5 READMEs manquants créés : adversarial-review, brainstorming-premortem, ci-polling, deploy-verify, tdd-bug-hunter
+- `LICENSE` (MIT) et `.gitignore` ajoutés à la racine
+- RAG cold storage : `rag/multi-agent-orchestration-2026-06-21.md` (sources vérifiées : cc-fleet, Hermes, worktree bug v2.1.121+)
+
+### Fixed
+- `tdd-bug-hunter/blueprint.json` : `allowed_commands` était vide → bug silencieux (verifier ne pouvait pas lancer les tests). Corrigé avec liste complète npm test/pytest/cargo test/etc.
+- README.md : badge blueprints-8 corrigé → blueprints-12
+
+### Changed
+- catalog.json v1.9.0 : 13 blueprints
+
 ## [0.6.0] — 2026-06-21
 
 ### Changed

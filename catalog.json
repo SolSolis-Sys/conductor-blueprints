@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "blueprints": [
     {
       "id": "solfoundy/idea-to-spec",
@@ -177,6 +177,22 @@
         "automation",
         "changelog",
         "maintenance"
+      ],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/fetch-web",
+      "name": "fetch-web",
+      "version": "1.0.0",
+      "description": "Deterministic web fetching pipeline with LLM synthesis. RAG-first: checks local cache before fetching. Tools handle HTTP, LLM handles analysis.",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "research",
+        "web",
+        "rag",
+        "fetch",
+        "synthesis",
+        "tool-llm-pipeline"
       ],
       "cost_tier": "low"
     }

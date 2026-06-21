@@ -1,0 +1,105 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/fetch-web",
+  "name": "fetch-web",
+  "version": "1.0.0",
+  "title": "Web Fetch & Synthesis Pipeline",
+  "description": "Deterministic web fetching pipeline with LLM synthesis. RAG-first: checks local cache before fetching. Tools handle HTTP, LLM handles analysis.",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["research", "web", "rag", "fetch", "synthesis", "tool-llm-pipeline"],
+  "inputs": [
+    {
+      "name": "urls",
+      "type": "string",
+      "description": "Comma-separated list of URLs to fetch (max 5). Example: https://example.com/page1,https://example.com/page2",
+      "required": true
+    },
+    {
+      "name": "query",
+      "type": "string",
+      "description": "Research question to answer from fetched content. Guides synthesis and RAG search.",
+      "required": true
+    },
+    {
+      "name": "rag_dir",
+      "type": "string",
+      "description": "Local RAG cache directory to check first. Path relative to conductor workspace.",
+      "required": false,
+      "default": "./rag"
+    },
+    {
+      "name": "output_format",
+      "type": "string",
+      "description": "Output format: markdown (default), json, or summary",
+      "required": false,
+      "default": "markdown"
+    },
+    {
+      "name": "max_urls",
+      "type": "number",
+      "description": "Maximum URLs to fetch in one run. Safety limit.",
+      "required": false,
+      "default": 5
+    }
+  ],
+  "cost_profile": {
+    "tier": "low",
+    "avg_tokens_per_run": 18000,
+    "estimated_cost_usd": 0.05
+  },
+  "permissions": {
+    "network": true,
+    "filesystem": "read-write",
+    "allowed_commands": ["curl", "find", "grep", "head"]
+  },
+  "agents": [
+    {
+      "role": "rag-checker",
+      "type": "tool",
+      "command": "find {{rag_dir}} -type f -name '*.txt' -o -name '*.md' 2>/dev/null | head -20",
+      "output_var": "cached_files",
+      "timeout_ms": 5000,
+      "on_failure": "continue"
+    },
+    {
+      "role": "rag-content-scanner",
+      "type": "tool",
+      "command": "for file in $(find {{rag_dir}} -type f \\( -name '*.txt' -o -name '*.md' \\) 2>/dev/null | head -10); do echo \"=== $file ===\"  && head -100 \"$file\"; done",
+      "output_var": "rag_content",
+      "timeout_ms": 10000,
+      "on_failure": "continue"
+    },
+    {
+      "role": "rag-evaluator",
+      "type": "agent",
+      "prompt": "You have access to local RAG cache files. Evaluate if they help answer this research question:\n\nQuery: {{query}}\n\nCached files found:\n{{rag_content}}\n\nRespond with JSON:\n{\n  \"rag_hit\": true|false,\n  \"relevant_snippets\": [\"snippet1\", \"snippet2\"],\n  \"confidence\": 0.0-1.0,\n  \"fetch_needed\": true|false,\n  \"reasoning\": \"Why rag_hit is true/false\"\n}\n\nIf confidence > 0.8, set fetch_needed to false. Otherwise, recommend fetching the provided URLs."
+    },
+    {
+      "role": "fetcher",
+      "type": "tool",
+      "command": "urls=\"{{urls}}\"; count=0; for url in ${urls//,/ }; do if [ $count -ge {{max_urls}} ]; then break; fi; echo \"=== Fetching: $url ===\"; curl -s -L --max-time 15 --user-agent 'conductor-fetch-web/1.0' \"$url\" | head -2000 || echo \"FETCH_ERROR: Failed to fetch $url\"; count=$((count+1)); done",
+      "output_var": "fetched_content",
+      "timeout_ms": 60000,
+      "on_failure": "continue",
+      "condition": "rag-evaluator.fetch_needed == true"
+    },
+    {
+      "role": "synthesizer",
+      "type": "agent",
+      "prompt": "Research Question: {{query}}\n\nAvailable Source Material:\n\nRAG Cache Snippets (if found):\n{{rag_content}}\n\nFreshly Fetched Content:\n{{fetched_content}}\n\nYour task:\n1. Synthesize all available sources (RAG + fetched) to answer the research question\n2. Cite sources by URL or filename\n3. Highlight key findings and contradictions if any\n4. Estimate confidence (low/medium/high)\n5. Suggest next search terms if answer is incomplete\n\nFormat output as {{output_format}}:\n- If 'markdown': use headers, lists, and code blocks\n- If 'json': return {\"answer\": \"\", \"sources\": [], \"confidence\": \"medium\", \"next_steps\": []}\n- If 'summary': 2-3 sentence summary only"
+    },
+    {
+      "role": "rag-writer",
+      "type": "tool",
+      "command": "mkdir -p {{rag_dir}} && timestamp=$(date +%s) && filename='{{rag_dir}}/query_{{timestamp}}.md' && echo '# Query: {{query}}\n\n## Sources\n{{fetched_content}}\n\n## Synthesized Answer\n{{synthesizer}}' > \"$filename\" && echo \"Cached to: $filename\"",
+      "output_var": "cache_status",
+      "timeout_ms": 5000,
+      "on_failure": "continue"
+    }
+  ],
+  "loop": {
+    "exit_condition": "synthesizer completed successfully with output",
+    "max_rounds": 1
+  }
+}

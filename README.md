@@ -17,7 +17,7 @@ If you've used Claude Code's loops or ultracode workflows to automate tasks, blu
 conductor hub install <blueprint-name>
 ```
 
-![Blueprints](https://img.shields.io/badge/blueprints-8-blue)
+![Blueprints](https://img.shields.io/badge/blueprints-12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > Not affiliated with Anthropic. Independent, unofficial project.

@@ -13,7 +13,7 @@
     { "name": "max_rounds", "type": "number", "description": "Max loop iterations", "default": 10 }
   ],
   "cost_profile": { "tier": "medium", "avg_tokens_per_run": 40000, "estimated_cost_usd": 0.12 },
-  "permissions": { "network": false, "filesystem": "read-write", "allowed_commands": [] },
+  "permissions": { "network": false, "filesystem": "read-write", "allowed_commands": ["npm test", "npx jest", "pytest", "mocha", "jest", "cargo test", "go test", "dotnet test"] },
   "agents": [
     { "role": "finder", "prompt": "Find one untested bug in {{target}}. Return: file, line, description, minimal repro." },
     { "role": "test-writer", "prompt": "Write a failing test for this bug: {{bug}}. Use the project's test framework." },

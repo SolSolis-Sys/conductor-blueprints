@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "blueprints": [
     {
       "id": "solfoundy/idea-to-spec",
@@ -13,6 +13,22 @@
         "idea-to-spec",
         "backlog",
         "feature"
+      ],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solfoundy/spec-to-feature",
+      "name": "spec-to-feature",
+      "version": "1.0.0",
+      "description": "Transforms a structured feature spec (T-*.md format) into a production-ready feature scaffold with file structure, risk assessment, and decomposed tasks.",
+      "author": "SolFoundy",
+      "tags": [
+        "spec",
+        "scaffold",
+        "planning",
+        "feature",
+        "production",
+        "tickets"
       ],
       "cost_tier": "medium"
     },

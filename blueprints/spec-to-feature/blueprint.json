@@ -1,0 +1,77 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solfoundy/spec-to-feature",
+  "name": "spec-to-feature",
+  "version": "1.0.0",
+  "title": "Spec → Production-Ready Feature Scaffold",
+  "description": "Transforms a structured feature spec (T-*.md format) into a complete implementation scaffold with file structure, risk assessment, decomposed tasks, and ready-to-execute tickets.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["spec", "scaffold", "planning", "feature", "production", "tickets"],
+  "inputs": [
+    {
+      "name": "spec_path",
+      "type": "string",
+      "description": "Absolute path to the spec file (e.g., 'D:/project/T-CONDUCTOR-MEMORY-0.md')",
+      "required": true
+    },
+    {
+      "name": "plugin_name",
+      "type": "string",
+      "description": "Plugin/feature name in kebab-case (e.g., 'conductor-memory', 'api-cache')",
+      "required": true
+    },
+    {
+      "name": "target_dir",
+      "type": "string",
+      "description": "Absolute path to target directory for scaffold (e.g., 'D:/HYPERION/conductor-memory')",
+      "required": true
+    },
+    {
+      "name": "node_min_version",
+      "type": "string",
+      "description": "Minimum Node.js version required (e.g., '18', '20')",
+      "required": false,
+      "default": "18"
+    },
+    {
+      "name": "tech_stack",
+      "type": "string",
+      "description": "Technology stack (e.g., 'Node.js + TypeScript + SQLite', 'Python + FastAPI')",
+      "required": false,
+      "default": "Node.js + TypeScript"
+    }
+  ],
+  "cost_profile": {
+    "tier": "medium",
+    "avg_tokens_per_run": 45000,
+    "estimated_cost_usd": 0.14
+  },
+  "permissions": {
+    "network": false,
+    "filesystem": "read-write",
+    "allowed_commands": ["mkdir", "touch", "find", "ls", "cat", "grep", "node", "npm", "npx"]
+  },
+  "agents": [
+    {
+      "role": "spec-reader",
+      "prompt": "Read and extract structured information from the feature specification.\n\nSpec path: {{spec_path}}\nPlugin name: {{plugin_name}}\nTech stack: {{tech_stack}}\n\nYour task:\n1. Read the spec file at the provided path\n2. Extract: feature title, description, DONE-WHEN criteria, dependencies, architecture notes\n3. Identify key modules/components mentioned in ARCHITECTURE section\n4. List any database schemas, hooks, CLI commands, or APIs described\n5. Extract open questions and risks\n6. Determine if this is a Node.js plugin, Python package, or other type\n\nReturn JSON:\n{\n  \"feature_title\": \"\",\n  \"feature_description\": \"\",\n  \"done_when\": [],\n  \"architecture_modules\": [],\n  \"schemas\": [{\"name\": \"\", \"fields\": []}],\n  \"hooks\": [{\"name\": \"\", \"trigger\": \"\", \"description\": \"\"}],\n  \"cli_commands\": [{\"name\": \"\", \"args\": \"\", \"description\": \"\"}],\n  \"apis\": [{\"endpoint\": \"\", \"method\": \"\", \"description\": \"\"}],\n  \"dependencies\": [],\n  \"open_questions\": [],\n  \"risks\": [],\n  \"plugin_type\": \"node-plugin|python-package|standalone\"\n}"
+    },
+    {
+      "role": "risk-assessor",
+      "prompt": "Evaluate implementation risks and complexity drivers.\n\nFeature: {{spec-reader.feature_title}}\nArchitecture: {{spec-reader.architecture_modules}}\nSchemas: {{spec-reader.schemas}}\nHooks: {{spec-reader.hooks}}\nDependencies: {{spec-reader.dependencies}}\nPlugin type: {{spec-reader.plugin_type}}\n\nYour task:\n1. Categorize each schema/hook/API by risk level (P0=blocking, P1=critical, P2=moderate, P3=low)\n2. Identify dependency conflicts or version constraints\n3. Evaluate hook coverage (are all required integration points covered?)\n4. Flag any architectural anti-patterns (e.g., circular dependencies, tight coupling)\n5. Estimate implementation phases (phase 1 = MVP, phase 2 = enhancements, etc.)\n6. Score overall complexity (1-10) with breakdown per module\n\nReturn JSON:\n{\n  \"risk_matrix\": [{\"item\": \"\", \"type\": \"schema|hook|api|dependency\", \"priority\": \"P0|P1|P2|P3\", \"rationale\": \"\"}],\n  \"dependency_conflicts\": [],\n  \"hook_coverage\": {\"covered\": [], \"missing\": []},\n  \"architectural_issues\": [],\n  \"phases\": [{\"name\": \"Phase 1: MVP\", \"items\": [], \"duration_days\": 0}],\n  \"complexity_score\": 0,\n  \"complexity_breakdown\": {},\n  \"blocking_decisions\": []\n}"
+    },
+    {
+      "role": "scaffold-planner",
+      "prompt": "Design the complete file structure and implementation order.\n\nPlugin name: {{plugin_name}}\nTarget directory: {{target_dir}}\nArchitecture modules: {{spec-reader.architecture_modules}}\nSchemas: {{spec-reader.schemas}}\nHooks: {{spec-reader.hooks}}\nRisk matrix: {{risk-assessor.risk_matrix}}\nPhases: {{risk-assessor.phases}}\nNode min version: {{node_min_version}}\n\nYour task:\n1. Design a production-ready file structure (tree format)\n2. Identify 4-8 core files/modules (config, entry point, schema definitions, hook handlers, etc.)\n3. For each core file, list its purpose and dependencies (which files must exist first)\n4. Order files by dependency (topological sort): foundational first, dependent files last\n5. Suggest a README outline (what sections are needed)\n6. Identify test structure (unit, integration, e2e)\n7. Create a package.json template snippet (if Node.js)\n\nReturn JSON:\n{\n  \"directory_tree\": \"\",\n  \"core_files\": [\n    {\"path\": \"src/index.ts\", \"purpose\": \"\", \"dependencies\": [], \"phase\": 1}\n  ],\n  \"file_order\": [],\n  \"readme_sections\": [],\n  \"test_structure\": {\"unit_dir\": \"\", \"integration_dir\": \"\", \"test_files\": []},\n  \"package_json_template\": {},\n  \"config_files\": []\n}"
+    },
+    {
+      "role": "task-decomposer",
+      "prompt": "Decompose the spec into atomic, testable tickets.\n\nFeature: {{spec-reader.feature_title}}\nCore files: {{scaffold-planner.core_files}}\nFile order: {{scaffold-planner.file_order}}\nRisks: {{risk-assessor.risk_matrix}}\nPhases: {{risk-assessor.phases}}\nDone-when criteria: {{spec-reader.done_when}}\n\nYour task:\n1. Create 8-15 granular tickets, each deliverable in 2-4 hours of focused work\n2. Each ticket must have:\n   - Clear title (e.g., 'T-CONDUCTOR-MEMORY-001: Core schema and migrations')\n   - DONE-WHEN: 3-5 specific, testable acceptance criteria\n   - Depends-on: which tickets (if any) must complete first\n   - Modified files: which files this ticket creates/modifies\n   - Estimated tokens: rough estimate of LLM work needed (1k-10k)\n3. Order tickets to respect dependencies (can run some in parallel)\n4. Group P0/P1 risks into earlier tickets\n5. Save architectural/decision tickets (design, config) early\n6. Ensure final ticket(s) verify the original DONE-WHEN criteria\n\nReturn JSON array:\n[\n  {\n    \"id\": \"T-CONDUCTOR-MEMORY-001\",\n    \"title\": \"Core schema and migrations\",\n    \"description\": \"\",\n    \"done_when\": [\n      \"SQLite schema defined in src/schema.ts\",\n      \"10 unit tests pass for schema validation\"\n    ],\n    \"depends_on\": [],\n    \"modified_files\": [\"src/schema.ts\", \"tests/unit/schema.test.ts\"],\n    \"estimated_tokens\": 2000,\n    \"phase\": 1,\n    \"risk_level\": \"P0\"\n  }\n]"
+    }
+  ],
+  "loop": {
+    "exit_condition": "task-decomposer returned a complete ticket array with no circular dependencies",
+    "max_rounds": 1
+  }
+}

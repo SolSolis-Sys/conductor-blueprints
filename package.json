@@ -1,6 +1,6 @@
 {
   "name": "conductor-blueprints",
-  "version": "1.6.0",
+  "version": "0.6.0",
   "description": "Stop reinventing your agent workflows. Browse, install, and share battle-tested orchestration patterns.",
   "scripts": {
     "test": "node scripts/validate.js"

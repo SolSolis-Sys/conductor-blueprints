@@ -6,6 +6,17 @@
 
 You've already solved a complex multi-agent problem — a TDD loop, a pre-push review, a deploy verifier. So has someone else. This is the place where those patterns live, ready to use in 30 seconds.
 
+## What is a blueprint?
+
+A blueprint is a reusable agent workflow template — similar to Claude Code's built-in `/loop`, `ultracode` dynamic workflows, or multi-agent orchestration patterns, but **packaged, versioned, and shareable**.
+
+If you've used Claude Code's loops or ultracode workflows to automate tasks, blueprints let you extract those patterns into installable templates that work across projects and teams.
+
+**Install a blueprint in one command:**
+```bash
+conductor hub install <blueprint-name>
+```
+
 ![Blueprints](https://img.shields.io/badge/blueprints-8-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 

@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
   "id": "solfoundy/idea-to-spec",
   "name": "idea-to-spec",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "title": "Idea → Structured Feature Spec",
   "description": "Transform a raw idea into a structured feature specification with research, cross-module analysis, and validation. Outputs a draft spec ready for backlog grooming.",
   "author": "SolFoundy",
@@ -38,6 +38,12 @@
       "type": "string",
       "description": "Additional context (constraints, dependencies, background)",
       "default": "none specified"
+    },
+    {
+      "name": "target_version",
+      "type": "string",
+      "description": "Target release version (e.g., 'v0.1.0', 'v0.2.0') — constrains scope to features deliverable without non-existent external dependencies",
+      "default": "v1.0.0"
     }
   ],
   "cost_profile": {
@@ -64,12 +70,16 @@
       "prompt": "Analyze integration points with existing system modules.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nRelated features: {{spec-researcher.related_features}}\nProject: {{project}}\n\nYour task:\n1. For each adjacent module from the research phase, identify 1-2 integration points\n2. Suggest how this feature could leverage or extend existing modules\n3. Flag any architectural contradictions or risks\n4. Identify which existing APIs, data models, or events this feature would interact with\n5. Assess implementation complexity (low / medium / high) with a brief rationale\n\nReturn JSON: { \"integration_points\": [{\"module\": \"\", \"points\": [], \"suggestion\": \"\"}], \"architecture_risks\": [], \"api_dependencies\": [], \"complexity\": \"low|medium|high\", \"complexity_rationale\": \"\" }"
     },
     {
+      "role": "scope-guardian",
+      "prompt": "Review the proposed feature scope against the target version constraints.\n\nIdea: {{idea}}\nTarget version: {{target_version}}\nIntegration points: {{cross-analyzer.integration_points}}\nArchitecture risks: {{cross-analyzer.architecture_risks}}\nBlockers: {{spec-researcher.blockers}}\n\nYour task:\n1. For each integration point, check: is this dependency available NOW, or does it require a system that does not yet exist?\n2. Flag features requiring non-existent external systems as OUT_OF_SCOPE for the target version\n3. Propose a reduced scope deliverable in {{target_version}} without non-existent dependencies\n4. List deferred features with suggested future version\n\nReturn JSON: { \"in_scope\": [], \"out_of_scope\": [{\"feature\": \"\", \"reason\": \"\", \"defer_to\": \"\"}], \"reduced_scope_summary\": \"\", \"deferred_features\": [] }"
+    },
+    {
       "role": "spec-drafter",
-      "prompt": "Draft a structured feature specification.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nOne-liner: {{idea-extractor.one_liner}}\nSpec ID: {{spec-researcher.suggested_id}}\nProject: {{project}}\nModule: {{module}}\nPriority: {{priority}}\nComplexity: {{cross-analyzer.complexity}}\nIntegration points: {{cross-analyzer.integration_points}}\nBlockers: {{spec-researcher.blockers}}\n\nYour task: Produce a complete feature specification in the following format:\n\n```\nid: [spec_id]\ntitle: [clear title]\nstatus: draft\npriority: [1-5]\nproject: [project]\nmodule: [module]\ncomplexity: [low|medium|high]\n\nDONE-WHEN:\n- [measurable acceptance criterion 1]\n- [measurable acceptance criterion 2]\n- [measurable acceptance criterion 3]\n\nCONTEXT:\n[2-3 sentences: why this matters, user value, business case]\n\nARCHITECTURE:\n[Key design decisions, data structures, API contracts, module interactions]\n\nDEPENDENCIES:\n[Blocking items, required integrations, prerequisite features]\n\nOPEN QUESTIONS:\n[Decisions to resolve before implementation starts]\n\nIMPLEMENTATION NOTES:\n[Suggested approach, phasing, edge cases to handle]\n```\n\nReturn plain text (markdown code block)."
+      "prompt": "Draft a structured feature specification.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nOne-liner: {{idea-extractor.one_liner}}\nSpec ID: {{spec-researcher.suggested_id}}\nProject: {{project}}\nModule: {{module}}\nPriority: {{priority}}\nComplexity: {{cross-analyzer.complexity}}\nIn-scope features: {{scope-guardian.in_scope}}\nDeferred (out of scope): {{scope-guardian.out_of_scope}}\nIntegration points: {{cross-analyzer.integration_points}}\nBlockers: {{spec-researcher.blockers}}\n\nYour task: Produce a complete feature specification in the following format:\n\n```\nid: [spec_id]\ntitle: [clear title]\nstatus: draft\npriority: [1-5]\nproject: [project]\nmodule: [module]\ncomplexity: [low|medium|high]\n\nDONE-WHEN:\n- [measurable acceptance criterion 1]\n- [measurable acceptance criterion 2]\n- [measurable acceptance criterion 3]\n\nCONTEXT:\n[2-3 sentences: why this matters, user value, business case]\n\nARCHITECTURE:\n[Key design decisions, data structures, API contracts, module interactions]\n\nDEPENDENCIES:\n[Blocking items, required integrations, prerequisite features]\n\nOPEN QUESTIONS:\n[Decisions to resolve before implementation starts]\n\nIMPLEMENTATION NOTES:\n[Suggested approach, phasing, edge cases to handle]\n```\n\nReturn plain text (markdown code block)."
     },
     {
       "role": "spec-validator",
-      "prompt": "Validate the drafted specification for completeness and quality.\n\nDrafted spec:\n{{spec-drafter}}\n\nValidation checklist:\n1. Spec ID follows the suggested format? ✓/✗\n2. Title is clear and specific (not vague)? ✓/✗\n3. DONE-WHEN criteria are measurable and testable? ✓/✗\n4. CONTEXT explains the user value or business case? ✓/✗\n5. ARCHITECTURE describes key design decisions? ✓/✗\n6. DEPENDENCIES identifies all blockers? ✓/✗\n7. OPEN QUESTIONS lists unresolved decisions? ✓/✗\n8. Integration points are addressed? ✓/✗\n9. Complexity estimate is justified? ✓/✗\n10. No scope creep (spec stays focused on the original idea)? ✓/✗\n\nYour task:\n1. For each failing check, suggest a specific correction\n2. Score spec quality (1-10) — completeness, clarity, testability\n3. Flag any risks (scope creep, missing dependencies, unclear ownership)\n4. Recommend ACCEPT (score >= 7) or ITERATE (score < 7)\n5. If ITERATE, list the required revisions\n\nReturn JSON: { \"checks\": {}, \"quality_score\": 0, \"risks\": [], \"recommendation\": \"ACCEPT|ITERATE\", \"revisions\": [] }"
+      "prompt": "Validate the drafted specification for completeness and quality.\n\nDrafted spec:\n{{spec-drafter}}\n\nOut-of-scope features: {{scope-guardian.out_of_scope}}\n\nValidation checklist:\n1. Spec ID follows the suggested format? ✓/✗\n2. Title is clear and specific (not vague)? ✓/✗\n3. DONE-WHEN criteria are measurable and testable? ✓/✗\n4. CONTEXT explains the user value or business case? ✓/✗\n5. ARCHITECTURE describes key design decisions? ✓/✗\n6. DEPENDENCIES identifies all blockers? ✓/✗\n7. OPEN QUESTIONS lists unresolved decisions? ✓/✗\n8. Integration points are addressed? ✓/✗\n9. Complexity estimate is justified? ✓/✗\n10. No scope creep (spec stays focused on the original idea)? ✓/✗\n11. No scope creep — only in-scope features from scope-guardian included? ✓/✗\n12. All DONE-WHEN criteria deliverable without non-existent external dependencies? ✓/✗\n\nYour task:\n1. For each failing check, suggest a specific correction\n2. Score spec quality (1-10) — completeness, clarity, testability\n3. Flag any risks (scope creep, missing dependencies, unclear ownership)\n4. Recommend ACCEPT (score >= 7) or ITERATE (score < 7)\n5. If ITERATE, list the required revisions\n\nReturn JSON: { \"checks\": {}, \"quality_score\": 0, \"risks\": [], \"recommendation\": \"ACCEPT|ITERATE\", \"revisions\": [] }"
     }
   ],
   "loop": {

@@ -19,11 +19,12 @@ conductor hub install <blueprint-name>
 
 ![Blueprints](https://img.shields.io/badge/blueprints-12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+
 > 🌐 Hub live → https://solsolis-sys.github.io/conductor-blueprints/
 
-> ⚠️ **Alpha — work in progress. Use at your own risk.** Expect rough edges. Found a bug or have a suggestion? Please [open an issue]
+> ⚠️ **Alpha — work in progress. Use at your own risk.** Expect rough edges. Found a bug or have a suggestion? Please [open an issue](https://github.com/SolSolis-Sys/conductor-blueprints/issues/new)
+
 > **Not affiliated with Anthropic.** This is an independent, unofficial tool — not a product of or endorsed by Anthropic.
-> Not affiliated with Anthropic. Independent, unofficial project.
 
 ---
 

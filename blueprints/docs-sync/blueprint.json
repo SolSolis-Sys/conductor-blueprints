@@ -1,0 +1,68 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/docs-sync",
+  "name": "docs-sync",
+  "version": "1.0.0",
+  "title": "Documentation Sync Pipeline",
+  "description": "Automates CHANGELOG, README, and roadmap updates after releases using git log and GitHub issue tracking.",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["documentation", "release", "automation", "changelog", "maintenance"],
+  "inputs": [
+    {
+      "name": "repo_url",
+      "type": "string",
+      "description": "GitHub repository URL (e.g., https://github.com/owner/repo)",
+      "required": true
+    },
+    {
+      "name": "current_version",
+      "type": "string",
+      "description": "New version being released (e.g., 1.2.0)",
+      "required": true
+    },
+    {
+      "name": "previous_tag",
+      "type": "string",
+      "description": "Previous release tag for git log range (e.g., v1.1.0). Leave empty to use last tag automatically.",
+      "required": false,
+      "default": "auto"
+    }
+  ],
+  "cost_profile": {
+    "tier": "low",
+    "avg_tokens_per_run": 25000,
+    "estimated_cost_usd": 0.08
+  },
+  "permissions": {
+    "network": true,
+    "filesystem": "read-write",
+    "allowed_commands": ["git", "curl", "grep"]
+  },
+  "agents": [
+    {
+      "role": "changelog-extractor",
+      "type": "tool",
+      "command": "git log {{previous_tag}}..HEAD --oneline --format='%h %s' | grep -E '^[a-f0-9]+ (feat|fix|refactor|chore|perf|docs):'",
+      "output_var": "git_commits",
+      "timeout_ms": 10000,
+      "on_failure": "continue"
+    },
+    {
+      "role": "changelog-analyzer",
+      "prompt": "Parse these git commits and generate a structured CHANGELOG entry:\n\nCommits:\n{{git_commits}}\n\nVersion: {{current_version}}\nRepo: {{repo_url}}\n\nProduce a JSON response with:\n1. features: array of { title, description, commit_hash }\n2. fixes: array of { title, description, commit_hash }\n3. refactors: array of { title, description, commit_hash }\n4. summary: one-line release summary\n\nFormat commit messages as readable titles (remove hash prefix). Group by category."
+    },
+    {
+      "role": "readme-updater",
+      "prompt": "Update README.md with the new release. Context:\n\nVersion: {{current_version}}\nChangelog data: {{changelog-analyzer}}\nRepo: {{repo_url}}\n\nYour tasks:\n1. Update version badge to {{current_version}}\n2. Add or update \"What's New\" section with top 3 features/fixes\n3. Add changelog link: [CHANGELOG.md](CHANGELOG.md#v{{current_version}})\n4. Keep existing README structure, only modify version-related sections\n\nReturn JSON:\n{\n  \"sections_updated\": [\"what's-new\", \"badge\", \"changelog-link\"],\n  \"changes_summary\": \"Human-readable summary of what was changed\",\n  \"file_content\": \"Complete updated README.md content\"\n}"
+    },
+    {
+      "role": "roadmap-syncer",
+      "prompt": "Update roadmap status based on release. Context:\n\nVersion released: {{current_version}}\nFeatures in this release: {{changelog-analyzer.features}}\nRepo: {{repo_url}}\n\nYour tasks:\n1. Review existing roadmap.md or README roadmap section\n2. Mark features in {{changelog-analyzer.features}} as ✓ DONE\n3. Propose 3-5 next steps based on open GitHub issues (if available)\n4. Estimate effort for each next step (Low/Medium/High)\n\nReturn JSON:\n{\n  \"completed_items\": [\"feature-1\", \"feature-2\"],\n  \"next_items\": [{\"title\": \"\", \"effort\": \"Low|Medium|High\", \"description\": \"\"}],\n  \"roadmap_content\": \"Updated roadmap.md or roadmap section (if exists)\",\n  \"has_roadmap_file\": true|false\n}"
+    }
+  ],
+  "loop": {
+    "exit_condition": "All three agents (changelog-analyzer, readme-updater, roadmap-syncer) completed successfully",
+    "max_rounds": 1
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "blueprints": [
     {
       "id": "solfoundy/idea-to-spec",
@@ -162,6 +162,21 @@
         "validation",
         "tool",
         "conductor"
+      ],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/docs-sync",
+      "name": "docs-sync",
+      "version": "1.0.0",
+      "description": "Automates CHANGELOG, README, and roadmap updates after releases using git log and GitHub issue tracking.",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "documentation",
+        "release",
+        "automation",
+        "changelog",
+        "maintenance"
       ],
       "cost_tier": "low"
     }

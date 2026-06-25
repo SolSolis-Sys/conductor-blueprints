@@ -1,10 +1,62 @@
 {
-  "version": "1.9.0",
+  "version": "2.0.0",
+  "artefacts": {
+    "agents": [
+      "adversarial-reviewer",
+      "changelog-analyzer",
+      "cross-analyzer",
+      "dependency-checker",
+      "discover-guide",
+      "finder",
+      "fixer",
+      "gate-decision",
+      "health-checker",
+      "idea-extractor",
+      "ideator-alternative",
+      "ideator-constrained",
+      "ideator-future",
+      "ideator-nominal",
+      "install-validator",
+      "log-extractor",
+      "loop-auditor",
+      "loop-improver",
+      "onboarding-verdict",
+      "premortem-analyst",
+      "quality-analyzer",
+      "rag-evaluator",
+      "readme-updater",
+      "refuter",
+      "risk-assessor",
+      "roadmap-syncer",
+      "rollback-trigger",
+      "scaffold-planner",
+      "schema-validator",
+      "scope-guardian",
+      "scrub-checker",
+      "security-reviewer",
+      "skill-improver",
+      "smoke-runner",
+      "spec-drafter",
+      "spec-reader",
+      "spec-researcher",
+      "spec-validator",
+      "sqlite-architect",
+      "structure-auditor",
+      "submit-drilldown",
+      "synthesizer",
+      "task-decomposer",
+      "test-writer",
+      "verifier",
+      "watcher"
+    ],
+    "tools": ["write_file", "read_file", "validate_schema"]
+  },
   "blueprints": [
     {
       "id": "solfoundy/idea-to-spec",
       "name": "idea-to-spec",
       "version": "1.0.2",
+      "schema_version": "1.0.0",
       "description": "Transform a raw idea into a structured feature spec with research, integration analysis, and validation.",
       "author": "SolFoundy",
       "tags": [
@@ -20,6 +72,7 @@
       "id": "solfoundy/spec-to-feature",
       "name": "spec-to-feature",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Transforms a structured feature spec (T-*.md format) into a production-ready feature scaffold with file structure, risk assessment, and decomposed tasks.",
       "author": "SolFoundy",
       "tags": [
@@ -36,6 +89,7 @@
       "id": "solsolis/tdd-bug-hunter",
       "name": "tdd-bug-hunter",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
       "author": "SolSolis-Sys",
       "tags": [
@@ -49,6 +103,7 @@
       "id": "solsolis/adversarial-review",
       "name": "adversarial-review",
       "version": "1.1.0",
+      "schema_version": "1.0.0",
       "description": "Multi-perspective code review with N independent refuters — only surviving findings are reported",
       "author": "SolSolis-Sys",
       "tags": [
@@ -63,6 +118,7 @@
       "id": "solsolis/ci-polling",
       "name": "ci-polling",
       "version": "1.1.0",
+      "schema_version": "1.0.0",
       "description": "Polls CI status, extracts failure logs, applies auto-fix, loops until green",
       "author": "SolSolis-Sys",
       "tags": [
@@ -77,6 +133,7 @@
       "id": "solsolis/deploy-verify",
       "name": "deploy-verify",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Post-deploy health polling loop with smoke tests and optional auto-rollback",
       "author": "SolSolis-Sys",
       "tags": [
@@ -92,6 +149,7 @@
       "id": "solsolis/brainstorming-premortem",
       "name": "brainstorming-premortem",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Multi-angle idea generation followed by adversarial pre-mortem: surfaces risks before committing to a plan",
       "author": "SolSolis-Sys",
       "tags": [
@@ -107,6 +165,7 @@
       "id": "solsolis/pre-push-cohesion-check",
       "name": "pre-push-cohesion-check",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, scrub anti-leak",
       "author": "SolSolis-Sys",
       "tags": [
@@ -123,6 +182,7 @@
       "id": "solsolis/self-skill-improvement",
       "name": "self-skill-improvement",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Reads a SKILL.md via deterministic tool step, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP",
       "author": "SolSolis-Sys",
       "tags": [
@@ -138,6 +198,7 @@
       "id": "solsolis/conductor-loop-improvement",
       "name": "conductor-loop-improvement",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Audits and improves the loop configuration of an existing conductor blueprint — surfaces infinite loop risks and unclear exit conditions",
       "author": "SolSolis-Sys",
       "tags": [
@@ -153,6 +214,7 @@
       "id": "solfoundy/onboarding-external",
       "name": "onboarding-external",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Simulates the complete onboarding journey for an external user discovering conductor, installing blueprints, and submitting their own. Validates UX fluidity end-to-end.",
       "author": "SolFoundy",
       "tags": [
@@ -169,6 +231,7 @@
       "id": "solsolis/docs-sync",
       "name": "docs-sync",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Automates CHANGELOG, README, and roadmap updates after releases using git log and GitHub issue tracking.",
       "author": "SolSolis-Sys",
       "tags": [
@@ -184,6 +247,7 @@
       "id": "solsolis/fetch-web",
       "name": "fetch-web",
       "version": "1.0.0",
+      "schema_version": "1.0.0",
       "description": "Deterministic web fetching pipeline with LLM synthesis. RAG-first: checks local cache before fetching. Tools handle HTTP, LLM handles analysis.",
       "author": "SolSolis-Sys",
       "tags": [

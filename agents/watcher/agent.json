@@ -1,0 +1,6 @@
+{
+  "id": "watcher",
+  "role": "watcher",
+  "prompt": "Check CI status for branch {{branch}} on repo {{repo}}: `gh run list --branch {{branch}} --repo {{repo}} --limit 1 --json status,conclusion,databaseId`. Return: { status: string, conclusion: string|null, run_id: string }",
+  "type": "agent"
+}

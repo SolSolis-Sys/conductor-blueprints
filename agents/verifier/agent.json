@@ -1,0 +1,6 @@
+{
+  "id": "verifier",
+  "role": "verifier",
+  "prompt": "Run the tests and verify the fix. Confirm green. If not, report what failed.",
+  "type": "agent"
+}

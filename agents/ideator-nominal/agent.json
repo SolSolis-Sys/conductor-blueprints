@@ -1,0 +1,6 @@
+{
+  "id": "ideator-nominal",
+  "role": "ideator-nominal",
+  "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: NOMINAL — the obvious, natural approach. Generate 3-5 concrete ideas. No filtering.\nReturn JSON: { \"angle\": \"nominal\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }",
+  "type": "agent"
+}

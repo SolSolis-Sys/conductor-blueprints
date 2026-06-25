@@ -1,0 +1,6 @@
+{
+  "id": "rollback-trigger",
+  "role": "rollback-trigger",
+  "prompt": "Deploy verification failed after {{max_attempts}} attempts. Execute rollback: `{{rollback_command}}`. Report rollback outcome and notify human.",
+  "type": "agent"
+}

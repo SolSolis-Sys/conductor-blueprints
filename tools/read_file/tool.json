@@ -1,0 +1,20 @@
+{
+  "id": "read_file",
+  "type": "tool",
+  "description": "Reads file content from the specified path.",
+  "params": {
+    "path": { "type": "string", "required": true, "description": "File path to read" },
+    "encoding": { "type": "string", "default": "utf8" }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "content": { "type": "string" },
+      "path": { "type": "string" }
+    },
+    "required": ["success"]
+  },
+  "implementation": "lib/blueprint/tool/read-file.js",
+  "permissions": { "filesystem": "read-only" }
+}

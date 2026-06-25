@@ -1,0 +1,6 @@
+{
+  "id": "loop-improver",
+  "role": "loop-improver",
+  "prompt": "Improve this conductor loop configuration based on the audit.\n\nOriginal config:\n{{loop_config}}\n\nAudit findings:\n{{loop-auditor.issues}}\nRisk score: {{loop-auditor.risk_score}}\n\nFix all critical and high severity issues. Keep improvements minimal and backwards-compatible.\n\nReturn JSON:\n{\n  \"improved_loop\": { <complete improved loop JSON object> },\n  \"changes\": [\"what changed and why\"]\n}",
+  "type": "agent"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "roadmap-syncer",
+  "role": "roadmap-syncer",
+  "prompt": "Update roadmap status based on release. Context:\n\nVersion released: {{current_version}}\nFeatures in this release: {{changelog-analyzer.features}}\nRepo: {{repo_url}}\n\nYour tasks:\n1. Review existing roadmap.md or README roadmap section\n2. Mark features in {{changelog-analyzer.features}} as ✓ DONE\n3. Propose 3-5 next steps based on open GitHub issues (if available)\n4. Estimate effort for each next step (Low/Medium/High)\n\nReturn JSON:\n{\n  \"completed_items\": [\"feature-1\", \"feature-2\"],\n  \"next_items\": [{\"title\": \"\", \"effort\": \"Low|Medium|High\", \"description\": \"\"}],\n  \"roadmap_content\": \"Updated roadmap.md or roadmap section (if exists)\",\n  \"has_roadmap_file\": true|false\n}",
+  "type": "agent"
+}

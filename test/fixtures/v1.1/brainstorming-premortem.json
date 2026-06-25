@@ -1,0 +1,45 @@
+{
+  "blueprint_name": "brainstorming-premortem",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 6,
+  "gates": [
+    {
+      "id": "g1-ideator-nominal",
+      "type": "agent",
+      "role": "ideator-nominal",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: NOMINAL — the obvious, natural approach. Generate 3-5 concrete ideas. No filtering.\nReturn JSON: { \"angle\": \"nominal\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "id": "g2-ideator-alternative",
+      "type": "agent",
+      "role": "ideator-alternative",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: ALTERNATIVE — the opposite or radically different approach. What if you did the reverse?\nReturn JSON: { \"angle\": \"alternative\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "id": "g3-ideator-constrained",
+      "type": "agent",
+      "role": "ideator-constrained",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: SEVERE CONSTRAINTS — half the time, 10% budget, minimal team. Absolute MVP only.\nReturn JSON: { \"angle\": \"constrained\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "id": "g4-ideator-future",
+      "type": "agent",
+      "role": "ideator-future",
+      "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: FUTURE REGRET — in 1 year, what will you wish you had done now? What short-term thinking will you regret?\nReturn JSON: { \"angle\": \"future\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }"
+    },
+    {
+      "id": "g5-premortem-analyst",
+      "type": "agent",
+      "role": "premortem-analyst",
+      "prompt": "Pre-mortem for: {{topic}}\nIt is 6 months from now. The plan failed.\nYour assigned failure category (by instance index 0-4): technical | user | platform | dependencies | scope\nFrom your category's perspective, what went wrong?\nReturn JSON: { \"category\": \"\", \"risks\": [{\"description\": \"\", \"probability\": \"high|medium|low\", \"impact\": \"critical|moderate|minor\", \"mitigation\": \"\"}] }",
+      "parallel": "{{premortem_analyst_count}}"
+    },
+    {
+      "id": "g6-synthesizer",
+      "type": "agent",
+      "role": "synthesizer",
+      "prompt": "Synthesize brainstorming and pre-mortem for: {{topic}}\n\nIdeas collected:\n- Nominal: {{ideator-nominal.ideas}}\n- Alternative: {{ideator-alternative.ideas}}\n- Constrained: {{ideator-constrained.ideas}}\n- Future: {{ideator-future.ideas}}\n\nRisks from pre-mortem: {{premortem-analyst.risks}}\n\nProduce:\n1. top_ideas: best 2-3 ideas with rationale\n2. critical_risks: top 3 risks with mitigations\n3. unknowns: what we don't know yet\n4. success_criterion: one measurable signal of success\n5. mvp_if_halved: scope if time is cut in half\n6. verdict: READY_TO_PLAN | NEEDS_INVESTIGATION | STOP\n7. verdict_reason: one sentence"
+    }
+  ]
+}

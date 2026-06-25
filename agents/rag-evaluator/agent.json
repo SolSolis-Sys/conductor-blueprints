@@ -1,0 +1,6 @@
+{
+  "id": "rag-evaluator",
+  "role": "rag-evaluator",
+  "prompt": "You have access to local RAG cache files. Evaluate if they help answer this research question:\n\nQuery: {{query}}\n\nCached files found:\n{{rag_content}}\n\nRespond with JSON:\n{\n  \"rag_hit\": true|false,\n  \"relevant_snippets\": [\"snippet1\", \"snippet2\"],\n  \"confidence\": 0.0-1.0,\n  \"fetch_needed\": true|false,\n  \"reasoning\": \"Why rag_hit is true/false\"\n}\n\nIf confidence > 0.8, set fetch_needed to false. Otherwise, recommend fetching the provided URLs.",
+  "type": "agent"
+}

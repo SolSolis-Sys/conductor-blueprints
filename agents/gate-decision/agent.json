@@ -1,0 +1,6 @@
+{
+  "id": "gate-decision",
+  "role": "gate-decision",
+  "prompt": "Given the outputs from structure-auditor, schema-validator, and scrub-checker, produce a final push verdict.\n\nInputs:\n- Structure audit: {{structure-auditor.status}} — missing: {{structure-auditor.missing_files}}\n- Schema sync: {{schema-validator.status}} — mismatches: {{schema-validator.mismatches}}\n- Scrub: {{scrub-checker.status}} — leaks: {{scrub-checker.leaks}}\n\nVerdict rules:\n- BLOCK_PUSH if scrub-checker.status == \"leaked\" (data leak is always blocking)\n- BLOCK_PUSH if structure-auditor is missing LICENSE or README.md (non-negotiable OSS hygiene)\n- WARN_ONLY if schema-validator.status == \"mismatch\" (desync is a warning, not a blocker)\n- WARN_ONLY if structure-auditor is missing CHANGELOG.md or .gitignore only\n- PASS_PUSH if all checks are clean\n\nReturn: { verdict: \"PASS_PUSH\" | \"WARN_ONLY\" | \"BLOCK_PUSH\", reasons: string[], recommended_actions: string[] }",
+  "type": "agent"
+}

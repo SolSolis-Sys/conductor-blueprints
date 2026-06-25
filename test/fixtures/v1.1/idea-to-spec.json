@@ -1,0 +1,50 @@
+{
+  "blueprint_name": "idea-to-spec",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 6,
+  "gates": [
+    {
+      "id": "g1-idea-extractor",
+      "type": "agent",
+      "role": "idea-extractor",
+      "prompt": "Extract and clarify the raw idea.\n\nIdea: {{idea}}\nProject: {{project}}\nModule: {{module}}\nContext: {{context}}\n\nYour task:\n1. Restate the idea in one sentence (core value proposition)\n2. Identify 3-5 key constraints or assumptions\n3. List known adjacent modules or related features in the project\n4. Identify gaps or unknowns that need clarification\n5. Suggest a short slug for this feature (e.g. 'email-verification', 'dark-mode')\n\nReturn JSON: { \"title\": \"\", \"one_liner\": \"\", \"key_assumptions\": [], \"adjacent_modules\": [], \"unknowns\": [], \"slug\": \"\" }",
+      "prompt_truncated": false
+    },
+    {
+      "id": "g2-spec-researcher",
+      "type": "agent",
+      "role": "spec-researcher",
+      "prompt": "Research related specs and existing work.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nAdjacent modules: {{idea-extractor.adjacent_modules}}\nProject: {{project}}\n\nYour task:\n1. List 3-5 related features or components that may intersect with this idea\n2. For each, explain the relationship (depends-on, conflicts-with, or independent)\n3. Flag any in-progress work that might affect this idea\n4. Suggest a unique spec ID (format: SPEC-{{project}}-{{module}}-NN)\n5. Identify any blockers or prerequisites\n\nReturn JSON: { \"related_features\": [{\"name\": \"\", \"relation\": \"depends-on|conflicts-with|independent\", \"explanation\": \"\"}], \"suggested_id\": \"\", \"blockers\": [], \"in_progress_related\": [] }",
+      "prompt_truncated": false
+    },
+    {
+      "id": "g3-cross-analyzer",
+      "type": "agent",
+      "role": "cross-analyzer",
+      "prompt": "Analyze integration points with existing system modules.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nRelated features: {{spec-researcher.related_features}}\nProject: {{project}}\n\nYour task:\n1. For each adjacent module from the research phase, identify 1-2 integration points\n2. Suggest how this feature could leverage or extend existing modules\n3. Flag any architectural contradictions or risks\n4. Identify which existing APIs, data models, or events this feature would interact with\n5. Assess implementation complexity (low / medium / high) with a brief rationale\n\nReturn JSON: { \"integration_points\": [{\"module\": \"\", \"points\": [], \"suggestion\": \"\"}], \"architecture_risks\": [], \"api_dependencies\": [], \"complexity\": \"low|medium|high\", \"complexity_rationale\": \"\" }",
+      "prompt_truncated": false
+    },
+    {
+      "id": "g4-scope-guardian",
+      "type": "agent",
+      "role": "scope-guardian",
+      "prompt": "Review the proposed feature scope against the target version constraints.\n\nIdea: {{idea}}\nTarget version: {{target_version}}\nIntegration points: {{cross-analyzer.integration_points}}\nArchitecture risks: {{cross-analyzer.architecture_risks}}\nBlockers: {{spec-researcher.blockers}}\n\nYour task:\n1. For each integration point, check: is this dependency available NOW, or does it require a system that does not yet exist?\n2. Flag features requiring non-existent external systems as OUT_OF_SCOPE for the target version\n3. Propose a reduced scope deliverable in {{target_version}} without non-existent dependencies\n4. List deferred features with suggested future version\n\nReturn JSON: { \"in_scope\": [], \"out_of_scope\": [{\"feature\": \"\", \"reason\": \"\", \"defer_to\": \"\"}], \"reduced_scope_summary\": \"\", \"deferred_features\": [] }",
+      "prompt_truncated": false
+    },
+    {
+      "id": "g5-spec-drafter",
+      "type": "agent",
+      "role": "spec-drafter",
+      "prompt": "Draft a structured feature specification.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nOne-liner: {{idea-extractor.one_liner}}\nSpec ID: {{spec-researcher.suggested_id}}\nProject: {{project}}\nModule: {{module}}\nPriority: {{priority}}\nComplexity: {{cross-analyzer.complexity}}\nIn-scope features: {{scope-guardian.in_scope}}\nDeferred (out of scope): {{scope-guardian.out_of_scope}}\nInteg",
+      "prompt_truncated": true
+    },
+    {
+      "id": "g6-spec-validator",
+      "type": "agent",
+      "role": "spec-validator",
+      "prompt": "Validate the drafted specification for completeness and quality.\n\nDrafted spec:\n{{spec-drafter}}\n\nOut-of-scope features: {{scope-guardian.out_of_scope}}\n\nValidation checklist:\n1. Spec ID follows the suggested format? ✓/✗\n2. Title is clear and specific (not vague)? ✓/✗\n3. DONE-WHEN criteria are measurable and testable? ✓/✗\n4. CONTEXT explains the user value or business case? ✓/✗\n5. ARCHITECTURE describes key design decisions? ✓/✗\n6. DEPENDENCIES identifies all blockers? ✓/✗\n7. OPEN QUESTIONS lists unresolved decisions? ✓/✗\n8. Integration points are addressed? ✓/✗\n9. Complexity estimate is justified? ✓/✗\n10. No scope creep (spec stays focused on the original idea)? ✓/",
+      "prompt_truncated": true
+    }
+  ]
+}

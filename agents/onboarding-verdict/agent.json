@@ -1,0 +1,6 @@
+{
+  "id": "onboarding-verdict",
+  "role": "onboarding-verdict",
+  "prompt": "As the final validator, produce an onboarding verdict.\n\nOnboarding summary:\n- Discovery guide: {{discover-guide}}\n- Install validator results: {{install-validator}}\n- Submission requirements: {{submit-drilldown}}\n- Schema validation: {{schema_validation}}\n\nYour task:\n1. Rate overall onboarding UX (1-10)\n2. Summarize the three phases (discover, install, submit) with one sentence each\n3. Identify the top 3 improvements needed\n4. Assess blockers for new contributors (technical skill, documentation clarity, tooling)\n5. Final recommendation: SMOOTH (ready for external contributors) or NEEDS_IMPROVEMENT (gaps exist)\n\nReturn JSON: { \"ux_score\": 0, \"phases_summary\": {\"discover\": \"\", \"install\": \"\", \"submit\": \"\"}, \"top_improvements\": [], \"contributor_blockers\": [], \"recommendation\": \"SMOOTH|NEEDS_IMPROVEMENT\" }",
+  "type": "agent"
+}

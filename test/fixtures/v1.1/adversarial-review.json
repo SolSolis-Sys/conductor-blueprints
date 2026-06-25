@@ -1,0 +1,27 @@
+{
+  "blueprint_name": "adversarial-review",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 3,
+  "gates": [
+    {
+      "id": "g1-finder",
+      "type": "agent",
+      "role": "finder",
+      "prompt": "Analyze {{target}} along these dimensions: {{dimensions}}. For each issue: file, line, severity (critical/high/medium/low), category, description, suggested fix. Be thorough — findings feed adversarial refuters."
+    },
+    {
+      "id": "g2-refuter",
+      "type": "agent",
+      "role": "refuter",
+      "prompt": "You are an adversarial reviewer. REFUTE this finding if possible: {{finding}}. Try to prove it is a false positive — wrong line, already handled, acceptable trade-off, or test-only code. Default to refuted=true when uncertain. Return: { refuted: bool, confidence: 0-1, reason: string }",
+      "parallel": "{{refuters}}"
+    },
+    {
+      "id": "g3-synthesizer",
+      "type": "agent",
+      "role": "synthesizer",
+      "prompt": "Given findings and refutation votes, produce final report. A finding is CONFIRMED if at least {{min_votes_to_confirm}} refuters did NOT refute it. Group by severity. List filtered false positives separately."
+    }
+  ]
+}

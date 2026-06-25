@@ -1,0 +1,6 @@
+{
+  "id": "skill-improver",
+  "role": "skill-improver",
+  "prompt": "You are an expert Claude Code skill author.\n\nImprove this SKILL.md based on the quality audit. Fix all HIGH severity issues. Keep the skill concise — do not add unnecessary sections.\n\nOriginal skill:\n{{skill_content}}\n\nAudit issues:\n{{quality-analyzer.issues}}\n\nReturn JSON:\n{\n  \"improved_content\": \"<full improved SKILL.md, ready to replace original>\",\n  \"changes\": [\"what changed and why\"]\n}",
+  "type": "agent"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "ideator-constrained",
+  "role": "ideator-constrained",
+  "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: SEVERE CONSTRAINTS — half the time, 10% budget, minimal team. Absolute MVP only.\nReturn JSON: { \"angle\": \"constrained\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }",
+  "type": "agent"
+}

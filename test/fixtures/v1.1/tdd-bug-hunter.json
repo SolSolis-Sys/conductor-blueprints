@@ -1,0 +1,32 @@
+{
+  "blueprint_name": "tdd-bug-hunter",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 4,
+  "gates": [
+    {
+      "id": "g1-finder",
+      "type": "agent",
+      "role": "finder",
+      "prompt": "Find one untested bug in {{target}}. Return: file, line, description, minimal repro."
+    },
+    {
+      "id": "g2-test-writer",
+      "type": "agent",
+      "role": "test-writer",
+      "prompt": "Write a failing test for this bug: {{bug}}. Use the project's test framework."
+    },
+    {
+      "id": "g3-fixer",
+      "type": "agent",
+      "role": "fixer",
+      "prompt": "Fix the bug exposed by this test: {{test}}. Minimal change only."
+    },
+    {
+      "id": "g4-verifier",
+      "type": "agent",
+      "role": "verifier",
+      "prompt": "Run the tests and verify the fix. Confirm green. If not, report what failed."
+    }
+  ]
+}

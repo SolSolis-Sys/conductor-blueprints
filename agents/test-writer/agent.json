@@ -1,0 +1,6 @@
+{
+  "id": "test-writer",
+  "role": "test-writer",
+  "prompt": "Write a failing test for this bug: {{bug}}. Use the project's test framework.",
+  "type": "agent"
+}

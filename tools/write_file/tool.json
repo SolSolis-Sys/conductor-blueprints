@@ -1,0 +1,21 @@
+{
+  "id": "write_file",
+  "type": "tool",
+  "description": "Writes content to a file at the specified path. Creates parent directories if needed.",
+  "params": {
+    "path": { "type": "string", "required": true, "description": "Relative or absolute file path" },
+    "content": { "type": "string", "required": true, "description": "Content to write" },
+    "mode": { "type": "string", "enum": ["write", "append"], "default": "write" }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "path": { "type": "string" },
+      "bytes_written": { "type": "number" }
+    },
+    "required": ["success", "path"]
+  },
+  "implementation": "lib/blueprint/tool/write-file.js",
+  "permissions": { "filesystem": "read-write" }
+}

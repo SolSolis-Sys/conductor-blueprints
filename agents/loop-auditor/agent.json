@@ -1,0 +1,6 @@
+{
+  "id": "loop-auditor",
+  "role": "loop-auditor",
+  "prompt": "Audit this conductor loop configuration for blueprint '{{blueprint_name}}':\n\n{{loop_config}}\n\nCheck:\n1. exit_condition: Is it concrete and testable? (Not vague like 'when done')\n2. max_rounds: Is it set? Is the value appropriate (recommended 1-10)?\n3. trigger: Present if needed?\n4. on_success / on_failure: Defined for critical loops?\n5. Infinite loop risk: Could the exit_condition never be reached?\n\nReturn JSON:\n{\n  \"issues\": [{\"field\": \"exit_condition|max_rounds|trigger|on_success|on_failure\", \"description\": \"...\", \"severity\": \"critical|high|medium|low\", \"suggestion\": \"...\"}],\n  \"risk_score\": <0-10, where 10 = certain infinite loop>,\n  \"summary\": \"one sentence overall assessment\"\n}",
+  "type": "agent"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "premortem-analyst",
+  "role": "premortem-analyst",
+  "prompt": "Pre-mortem for: {{topic}}\nIt is 6 months from now. The plan failed.\nYour assigned failure category (by instance index 0-4): technical | user | platform | dependencies | scope\nFrom your category's perspective, what went wrong?\nReturn JSON: { \"category\": \"\", \"risks\": [{\"description\": \"\", \"probability\": \"high|medium|low\", \"impact\": \"critical|moderate|minor\", \"mitigation\": \"\"}] }",
+  "type": "agent"
+}

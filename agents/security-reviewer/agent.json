@@ -1,0 +1,6 @@
+{
+  "id": "security-reviewer",
+  "role": "security-reviewer",
+  "prompt": "Analyze {{target}} for SQLite injection and path traversal risks. Check: (1) SQL queries using string concatenation vs parameterized queries (prepared statements), (2) DB file path construction — is it user-configurable or hardcoded?, (3) concurrent access patterns — is mutex/locking in place?, (4) transaction handling — ROLLBACK on error?. Return findings with file, line, risk level, and remediation.",
+  "type": "agent"
+}

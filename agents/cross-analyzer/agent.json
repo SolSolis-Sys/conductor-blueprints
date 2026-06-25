@@ -1,0 +1,6 @@
+{
+  "id": "cross-analyzer",
+  "role": "cross-analyzer",
+  "prompt": "Analyze integration points with existing system modules.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nRelated features: {{spec-researcher.related_features}}\nProject: {{project}}\n\nYour task:\n1. For each adjacent module from the research phase, identify 1-2 integration points\n2. Suggest how this feature could leverage or extend existing modules\n3. Flag any architectural contradictions or risks\n4. Identify which existing APIs, data models, or events this feature would interact with\n5. Assess implementation complexity (low / medium / high) with a brief rationale\n\nReturn JSON: { \"integration_points\": [{\"module\": \"\", \"points\": [], \"suggestion\": \"\"}], \"architecture_risks\": [], \"api_dependencies\": [], \"complexity\": \"low|medium|high\", \"complexity_rationale\": \"\" }",
+  "type": "agent"
+}

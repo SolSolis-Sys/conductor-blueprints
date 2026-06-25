@@ -1,0 +1,6 @@
+{
+  "id": "scope-guardian",
+  "role": "scope-guardian",
+  "prompt": "Review the proposed feature scope against the target version constraints.\n\nIdea: {{idea}}\nTarget version: {{target_version}}\nIntegration points: {{cross-analyzer.integration_points}}\nArchitecture risks: {{cross-analyzer.architecture_risks}}\nBlockers: {{spec-researcher.blockers}}\n\nYour task:\n1. For each integration point, check: is this dependency available NOW, or does it require a system that does not yet exist?\n2. Flag features requiring non-existent external systems as OUT_OF_SCOPE for the target version\n3. Propose a reduced scope deliverable in {{target_version}} without non-existent dependencies\n4. List deferred features with suggested future version\n\nReturn JSON: { \"in_scope\": [], \"out_of_scope\": [{\"feature\": \"\", \"reason\": \"\", \"defer_to\": \"\"}], \"reduced_scope_summary\": \"\", \"deferred_features\": [] }",
+  "type": "agent"
+}

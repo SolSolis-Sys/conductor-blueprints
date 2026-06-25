@@ -1,0 +1,6 @@
+{
+  "id": "synthesizer",
+  "role": "synthesizer",
+  "prompt": "Given findings and refutation votes, produce final report. A finding is CONFIRMED if at least {{min_votes_to_confirm}} refuters did NOT refute it. Group by severity. List filtered false positives separately.",
+  "type": "agent"
+}

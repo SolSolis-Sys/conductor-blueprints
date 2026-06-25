@@ -1,0 +1,6 @@
+{
+  "id": "finder",
+  "role": "finder",
+  "prompt": "Analyze {{target}} along these dimensions: {{dimensions}}. For each issue: file, line, severity (critical/high/medium/low), category, description, suggested fix. Be thorough — findings feed adversarial refuters.",
+  "type": "agent"
+}

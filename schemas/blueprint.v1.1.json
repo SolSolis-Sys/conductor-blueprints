@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Conductor Blueprint Schema v1.1",
+  "description": "Schema for claude-conductor blueprint.json files — v1.1 adds typed gates[] as a progressive replacement for agents[]. Fully backward-compatible: agents[] remains valid. gates[] is optional; if both present, gates[] takes priority at runtime (with a deprecation warning). NOTE: hub.js enforces only 'name', 'version', 'agents' — all other fields are validated by this schema for IDE support and contributor guidance only.",
+  "type": "object",
+  "required": ["name", "version"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Must point to https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^1\\.1\\.\\d+$",
+      "description": "Blueprint schema version. Use '1.1.0' for blueprints using gates[]. Absence triggers v1 coercion at runtime. Strongly recommended when using gates[].",
+      "examples": ["1.1.0"]
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+/[a-z0-9-]+$",
+      "description": "Namespaced identifier: 'github-handle/blueprint-name'"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Blueprint name in kebab-case"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version (semver)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable title"
+    },
+    "description": {
+      "type": "string",
+      "description": "One sentence: what does this blueprint do?"
+    },
+    "author": {
+      "type": "string",
+      "description": "GitHub handle of the author"
+    },
+    "license": {
+      "type": "string",
+      "enum": ["MIT", "Apache-2.0", "GPL-3.0", "BSD-2-Clause", "BSD-3-Clause"],
+      "description": "SPDX license identifier"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Relevant tags for discoverability"
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["string", "number", "boolean"] },
+          "description": { "type": "string" },
+          "required": { "type": "boolean" },
+          "default": {}
+        }
+      },
+      "description": "User-provided inputs. Reference in prompts as {{input_name}}"
+    },
+    "cost_profile": {
+      "type": "object",
+      "properties": {
+        "tier": { "type": "string", "enum": ["low", "medium", "high"] },
+        "avg_tokens_per_run": { "type": "number", "minimum": 100, "maximum": 500000 },
+        "estimated_cost_usd": { "type": "number", "minimum": 0 }
+      },
+      "description": "Cost estimation. Formula: agents/gates × ~10k tokens × $0.003/1k ≈ cost"
+    },
+    "permissions": {
+      "type": "object",
+      "properties": {
+        "network": { "type": "boolean" },
+        "filesystem": { "type": "string", "enum": ["none", "read-only", "read-write"] },
+        "allowed_commands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Shell commands allowed. NEVER include destructive commands (rm -rf, del, format)"
+        }
+      },
+      "description": "Minimum permissions required. Default to most restrictive."
+    },
+    "agents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "type": {
+            "type": "string",
+            "enum": ["agent", "tool"],
+            "default": "agent",
+            "description": "Step type. 'agent' (default) = LLM call. 'tool' = deterministic command, no LLM."
+          },
+          "prompt": {
+            "type": "string",
+            "description": "For agent steps: instruction. Supports {{input_name}} and {{role.field}} interpolation."
+          },
+          "command": {
+            "type": "string",
+            "description": "For tool steps: shell command or built-in tool. Supports {{input_name}} interpolation. Built-ins: conductor://tools/read-file, conductor://tools/validate-schema, conductor://tools/git-status."
+          },
+          "timeout_ms": {
+            "type": "number",
+            "minimum": 100,
+            "maximum": 300000,
+            "description": "For tool steps: max execution time in ms. Default: 5000."
+          },
+          "on_failure": {
+            "type": "string",
+            "enum": ["abort", "continue", "retry"],
+            "description": "For tool steps: behavior on non-zero exit. Default: 'abort'."
+          },
+          "output_var": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$",
+            "description": "For tool steps: captures stdout as a named variable. Reference in later steps as {{output_var}}."
+          },
+          "count": {
+            "description": "For agent steps: number of parallel instances. Use a number or {{input_name}} for dynamic count."
+          },
+          "condition": {
+            "type": "string",
+            "description": "Execute this step only if condition is true. E.g.: 'previous-agent.status == \"failure\"'"
+          }
+        }
+      },
+      "description": "LEGACY: Ordered steps inherited from v1. Still valid in v1.1. If gates[] is also present, gates[] takes priority at runtime with a deprecation warning. Prefer gates[] for new blueprints."
+    },
+    "gates": {
+      "type": "array",
+      "description": "v1.1 replacement for agents[]. Typed gates with explicit id, richer output validation, and parallel execution control. If both gates[] and agents[] are present, gates[] takes priority (runtime warning emitted). 'skill' type is reserved for Release 3 and not valid in v1.1.",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Gate identifier in kebab-case. Must be unique within the blueprint (uniqueness enforced at runtime, not by schema). Used for cross-gate references: {{gate-id.field}}."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["agent", "tool"],
+            "description": "Gate type. 'agent' = LLM call with a prompt. 'tool' = deterministic command, no LLM. Note: 'skill' type is reserved for Release 3 and is NOT valid in v1.1."
+          },
+          "role": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "For agent gates: role name in kebab-case. Identifies the agent persona or capability. Required when type is 'agent'."
+          },
+          "prompt": {
+            "type": "string",
+            "description": "For agent gates: LLM instruction. Supports {{input_name}} and {{gate-id.field}} interpolation. Required when type is 'agent'."
+          },
+          "ref": {
+            "type": "string",
+            "pattern": "^(agents|tools)/[a-z0-9-]+$",
+            "description": "Optional reference to a named agent or tool definition. Format: 'agents/<name>' or 'tools/<name>'. When present, inherits the referenced definition's defaults."
+          },
+          "command": {
+            "type": "string",
+            "description": "For tool gates: shell command or built-in conductor tool. Supports {{input_name}} interpolation. Built-ins: conductor://tools/read-file, conductor://tools/validate-schema, conductor://tools/git-status. Required when type is 'tool'."
+          },
+          "output_format": {
+            "type": "string",
+            "enum": ["json", "text"],
+            "default": "text",
+            "description": "Expected output format. 'json' enables output_schema validation and structured cross-gate references. Default: 'text'."
+          },
+          "output_schema": {
+            "type": "object",
+            "description": "JSON Schema draft-07 object validating the gate's output. Only evaluated when output_format is 'json'. Example: {\"type\": \"object\", \"required\": [\"status\"], \"properties\": {\"status\": {\"type\": \"string\"}}}",
+            "properties": {
+              "type": { "type": "string" }
+            }
+          },
+          "timeout_ms": {
+            "type": "number",
+            "minimum": 100,
+            "maximum": 300000,
+            "description": "Max execution time in milliseconds. Primarily for tool gates. Default: 5000."
+          },
+          "condition": {
+            "type": "string",
+            "description": "Execute this gate only if condition evaluates to true. Supports {{gate-id.field}} and {{input_name}} references. E.g.: '{{validator.status}} == \"pass\"'"
+          },
+          "parallel": {
+            "type": "integer",
+            "minimum": 2,
+            "description": "Number of parallel instances to spawn for this gate. Only values > 1 are meaningful (1 is the default serial behavior). Each instance receives the same inputs; use {{parallel_index}} within the prompt to differentiate."
+          }
+        }
+      }
+    },
+    "loop": {
+      "type": "object",
+      "properties": {
+        "exit_condition": {
+          "type": "string",
+          "description": "Concrete, testable condition for loop termination. Must be reachable."
+        },
+        "max_rounds": {
+          "description": "Safety cap. Recommended: 1-10. Use {{input_name}} for user-configurable cap.",
+          "maximum": 100
+        },
+        "trigger": { "type": "string" },
+        "on_success": { "type": "string" },
+        "on_failure": { "type": "string" }
+      },
+      "description": "Loop control. Always set max_rounds to prevent infinite loops. Note: 'on_max_rounds' (Release 2) and 'dry_run' (Release 3) are not valid in v1.1."
+    }
+  }
+}

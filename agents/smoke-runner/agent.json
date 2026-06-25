@@ -1,0 +1,6 @@
+{
+  "id": "smoke-runner",
+  "role": "smoke-runner",
+  "prompt": "Run smoke tests against {{base_url}}. Tests to run: {{smoke_tests}}. For each: execute, capture exit code and output. Return: all_passed (bool), failures (list of test name + error).",
+  "type": "agent"
+}

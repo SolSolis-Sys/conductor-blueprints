@@ -1,0 +1,34 @@
+{
+  "blueprint_name": "docs-sync",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 4,
+  "gates": [
+    {
+      "id": "g1-changelog-extractor",
+      "type": "tool",
+      "role": "changelog-extractor",
+      "command": "git log {{previous_tag}}..HEAD --oneline --format='%h %s' | grep -E '^[a-f0-9]+ (feat|fix|refactor|chore|perf|docs):'",
+      "on_fail_v1": "skip",
+      "timeout_ms": 10000
+    },
+    {
+      "id": "g2-changelog-analyzer",
+      "type": "agent",
+      "role": "changelog-analyzer",
+      "prompt": "Parse these git commits and generate a structured CHANGELOG entry:\n\nCommits:\n{{git_commits}}\n\nVersion: {{current_version}}\nRepo: {{repo_url}}\n\nProduce a JSON response with:\n1. features: array of { title, description, commit_hash }\n2. fixes: array of { title, description, commit_hash }\n3. refactors: array of { title, description, commit_hash }\n4. summary: one-line release summary\n\nFormat commit messages as readable titles (remove hash prefix). Group by category."
+    },
+    {
+      "id": "g3-readme-updater",
+      "type": "agent",
+      "role": "readme-updater",
+      "prompt": "Update README.md with the new release. Context:\n\nVersion: {{current_version}}\nChangelog data: {{changelog-analyzer}}\nRepo: {{repo_url}}\n\nYour tasks:\n1. Update version badge to {{current_version}}\n2. Add or update \"What's New\" section with top 3 features/fixes\n3. Add changelog link: [CHANGELOG.md](CHANGELOG.md#v{{current_version}})\n4. Keep existing README structure, only modify version-related sections\n\nReturn JSON:\n{\n  \"sections_updated\": [\"what's-new\", \"badge\", \"changelog-link\"],\n  \"changes_summary\": \"Human-readable summary of what was changed\",\n  \"file_content\": \"Complete updated README.md content\"\n}"
+    },
+    {
+      "id": "g4-roadmap-syncer",
+      "type": "agent",
+      "role": "roadmap-syncer",
+      "prompt": "Update roadmap status based on release. Context:\n\nVersion released: {{current_version}}\nFeatures in this release: {{changelog-analyzer.features}}\nRepo: {{repo_url}}\n\nYour tasks:\n1. Review existing roadmap.md or README roadmap section\n2. Mark features in {{changelog-analyzer.features}} as ✓ DONE\n3. Propose 3-5 next steps based on open GitHub issues (if available)\n4. Estimate effort for each next step (Low/Medium/High)\n\nReturn JSON:\n{\n  \"completed_items\": [\"feature-1\", \"feature-2\"],\n  \"next_items\": [{\"title\": \"\", \"effort\": \"Low|Medium|High\", \"description\": \"\"}],\n  \"roadmap_content\": \"Updated roadmap.md or roadmap section (if exists)\",\n  \"has_roadmap_file\": true|false\n}"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "id": "log-extractor",
+  "role": "log-extractor",
+  "prompt": "Extract CI failure logs: `gh run view {{watcher.run_id}} --repo {{repo}} --log-failed`. Return: { failing_step: string, error_lines: string (max 60 lines), file_hints: string[] }",
+  "type": "agent"
+}

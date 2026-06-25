@@ -1,0 +1,43 @@
+{
+  "blueprint_name": "self-skill-improvement",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 5,
+  "gates": [
+    {
+      "id": "g1-file-reader",
+      "type": "tool",
+      "role": "file-reader",
+      "command": "node conductor://tools/read-file {{skill_path}}",
+      "on_fail_v1": "stop",
+      "timeout_ms": 5000
+    },
+    {
+      "id": "g2-quality-analyzer",
+      "type": "agent",
+      "role": "quality-analyzer",
+      "prompt": "You are a quality auditor for Claude Code SKILL.md files.\n\nAnalyze this skill file and score it 1-5 on each dimension:\n1. Triggering: Are activation conditions clear and specific?\n2. Completeness: Are all steps, edge cases, and examples covered?\n3. Conciseness: Is it free of redundancy and padding?\n4. Actionability: Can an agent follow this exactly without ambiguity?\n5. Examples: Are there concrete before/after or input/output examples?\n\nReturn JSON:\n{\n  \"overall_score\": <average 1-5>,\n  \"scores\": { \"triggering\": <1-5>, \"completeness\": <1-5>, \"conciseness\": <1-5>, \"actionability\": <1-5>, \"examples\": <1-5> },\n  \"issues\": [{\"dimension\": \"...\", \"description\": \"...\", \"severity\": \"high|medium|low\"}],\n  \"strengths\": [\"...\"],\n  \"recommendation\": \"IMPROVE\" | \"KEEP\"\n}\n\nSkill file:\n{{skill_content}}",
+      "prompt_truncated": false
+    },
+    {
+      "id": "g3-skill-improver",
+      "type": "agent",
+      "role": "skill-improver",
+      "prompt": "You are an expert Claude Code skill author.\n\nImprove this SKILL.md based on the quality audit. Fix all HIGH severity issues. Keep the skill concise — do not add unnecessary sections.\n\nOriginal skill:\n{{skill_content}}\n\nAudit issues:\n{{quality-analyzer.issues}}\n\nReturn JSON:\n{\n  \"improved_content\": \"<full improved SKILL.md, ready to replace original>\",\n  \"changes\": [\"what changed and why\"]\n}",
+      "condition": "quality-analyzer.overall_score < {{quality_threshold}}"
+    },
+    {
+      "id": "g4-adversarial-reviewer",
+      "type": "agent",
+      "role": "adversarial-reviewer",
+      "prompt": "You are a skeptical reviewer. Your job is to REJECT improvements that make things worse.\n\nCheck the proposed improvement against the original:\n- Did it introduce unnecessary complexity?\n- Are all examples accurate and runnable?\n- Did any correct sections regress?\n- Is it still concise?\n\nOriginal:\n{{skill_content}}\n\nProposed improvements:\n{{skill-improver.changes}}\n\nReturn JSON:\n{\n  \"issues\": [{\"type\": \"complexity|inaccuracy|regression|bloat\", \"description\": \"...\", \"severity\": \"critical|warning\"}],\n  \"verdict\": \"APPROVE\" | \"REVISE\"\n}",
+      "condition": "quality-analyzer.overall_score < {{quality_threshold}}"
+    },
+    {
+      "id": "g5-synthesizer",
+      "type": "agent",
+      "role": "synthesizer",
+      "prompt": "Make the final decision on skill improvement.\n\nQuality score: {{quality-analyzer.overall_score}} / 5 (threshold: {{quality_threshold}})\nRecommendation: {{quality-analyzer.recommendation}}\nAdversarial verdict: {{adversarial-reviewer.verdict}}\nAdversarial issues: {{adversarial-reviewer.issues}}\n\nRules:\n- If score >= threshold: final_verdict = KEEP_ORIGINAL (no improvement needed)\n- If adversarial verdict = REVISE with critical issues: final_verdict = KEEP_ORIGINAL\n- Otherwise: final_verdict = ACCEPT_IMPROVED\n\nReturn JSON:\n{\n  \"final_verdict\": \"ACCEPT_IMPROVED\" | \"KEEP_ORIGINAL\",\n  \"final_content\": \"<improved SKILL.md content, or 'Use original' if KEEP_ORIGINAL>\",\n  \"summary\": \"One sentence explaining the decision\"\n}"
+    }
+  ]
+}

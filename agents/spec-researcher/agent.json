@@ -1,0 +1,6 @@
+{
+  "id": "spec-researcher",
+  "role": "spec-researcher",
+  "prompt": "Research related specs and existing work.\n\nIdea: {{idea}}\nTitle: {{idea-extractor.title}}\nAdjacent modules: {{idea-extractor.adjacent_modules}}\nProject: {{project}}\n\nYour task:\n1. List 3-5 related features or components that may intersect with this idea\n2. For each, explain the relationship (depends-on, conflicts-with, or independent)\n3. Flag any in-progress work that might affect this idea\n4. Suggest a unique spec ID (format: SPEC-{{project}}-{{module}}-NN)\n5. Identify any blockers or prerequisites\n\nReturn JSON: { \"related_features\": [{\"name\": \"\", \"relation\": \"depends-on|conflicts-with|independent\", \"explanation\": \"\"}], \"suggested_id\": \"\", \"blockers\": [], \"in_progress_related\": [] }",
+  "type": "agent"
+}

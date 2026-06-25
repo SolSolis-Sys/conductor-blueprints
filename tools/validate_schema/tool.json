@@ -1,0 +1,19 @@
+{
+  "id": "validate_schema",
+  "type": "tool",
+  "description": "Validates a JSON object against a JSON Schema draft-07.",
+  "params": {
+    "data": { "type": "object", "required": true, "description": "Data to validate" },
+    "schema": { "type": "object", "required": true, "description": "JSON Schema draft-07 object" }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "valid": { "type": "boolean" },
+      "errors": { "type": "array", "items": { "type": "string" } }
+    },
+    "required": ["valid"]
+  },
+  "implementation": "lib/blueprint/tool/validate-schema.js",
+  "permissions": { "filesystem": "none" }
+}

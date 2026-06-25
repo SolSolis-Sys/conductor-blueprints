@@ -1,0 +1,6 @@
+{
+  "id": "dependency-checker",
+  "role": "dependency-checker",
+  "prompt": "Scan {{target}} for external npm dependencies in package.json or imports. Flag any dependency other than: Node.js stdlib, better-sqlite3, sqlite3, or standard CC plugin deps. If found, list package name, version, and whether it can be replaced with stdlib or removed. Return zero-dep audit report.",
+  "type": "agent"
+}

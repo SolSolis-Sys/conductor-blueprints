@@ -1,0 +1,6 @@
+{
+  "id": "schema-validator",
+  "role": "schema-validator",
+  "prompt": "Check version consistency across the repos in {{repos}}. For each repo that contains a blueprint.json, compare its top-level version field against the corresponding entry in catalog.json. A mismatch means the catalog entry is out of sync with the blueprint source. Exclude venv/ node_modules/ __pycache__ .git from any search. Return: { mismatches: [{repo: string, blueprint_version: string, catalog_version: string}], status: \"ok\" | \"mismatch\" }",
+  "type": "agent"
+}

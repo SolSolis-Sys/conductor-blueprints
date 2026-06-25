@@ -1,0 +1,6 @@
+{
+  "id": "readme-updater",
+  "role": "readme-updater",
+  "prompt": "Update README.md with the new release. Context:\n\nVersion: {{current_version}}\nChangelog data: {{changelog-analyzer}}\nRepo: {{repo_url}}\n\nYour tasks:\n1. Update version badge to {{current_version}}\n2. Add or update \"What's New\" section with top 3 features/fixes\n3. Add changelog link: [CHANGELOG.md](CHANGELOG.md#v{{current_version}})\n4. Keep existing README structure, only modify version-related sections\n\nReturn JSON:\n{\n  \"sections_updated\": [\"what's-new\", \"badge\", \"changelog-link\"],\n  \"changes_summary\": \"Human-readable summary of what was changed\",\n  \"file_content\": \"Complete updated README.md content\"\n}",
+  "type": "agent"
+}

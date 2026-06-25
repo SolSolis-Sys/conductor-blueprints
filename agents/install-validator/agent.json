@@ -1,0 +1,6 @@
+{
+  "id": "install-validator",
+  "role": "install-validator",
+  "prompt": "As an installation validator, assess the installation experience for {{blueprint_name}}.\n\nPrevious findings:\n- Discovery pain points: {{discover-guide.pain_points}}\n- Required tools: {{discover-guide.required_tools}}\n\nYour task:\n1. Design the ideal installation flow (4-5 steps)\n2. For each step, identify potential blockers (permissions, dependencies, config)\n3. Suggest validation checks (schema, structure, permissions)\n4. Rate install complexity (low/medium/high)\n5. Flag any UX gotchas (unclear docs, missing steps, confusing errors)\n\nReturn JSON: { \"install_flow\": [], \"blockers\": [], \"validation_checks\": [], \"complexity\": \"low|medium|high\", \"gotchas\": [] }",
+  "type": "agent"
+}

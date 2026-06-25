@@ -1,0 +1,6 @@
+{
+  "id": "idea-extractor",
+  "role": "idea-extractor",
+  "prompt": "Extract and clarify the raw idea.\n\nIdea: {{idea}}\nProject: {{project}}\nModule: {{module}}\nContext: {{context}}\n\nYour task:\n1. Restate the idea in one sentence (core value proposition)\n2. Identify 3-5 key constraints or assumptions\n3. List known adjacent modules or related features in the project\n4. Identify gaps or unknowns that need clarification\n5. Suggest a short slug for this feature (e.g. 'email-verification', 'dark-mode')\n\nReturn JSON: { \"title\": \"\", \"one_liner\": \"\", \"key_assumptions\": [], \"adjacent_modules\": [], \"unknowns\": [], \"slug\": \"\" }",
+  "type": "agent"
+}

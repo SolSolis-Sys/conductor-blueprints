@@ -1,0 +1,6 @@
+{
+  "id": "sqlite-architect",
+  "role": "sqlite-architect",
+  "prompt": "Review SQLite configuration in {{target}}. Check for: (1) WAL mode enabled (PRAGMA journal_mode=WAL), (2) synchronous=NORMAL or FULL, (3) foreign_keys=ON, (4) busy_timeout set, (5) schema versioning via user_version PRAGMA. List each file with SQL/config, line number, and severity (critical/warning/info). Focus on atomicity and durability guarantees.",
+  "type": "agent"
+}

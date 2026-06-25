@@ -1,0 +1,6 @@
+{
+  "id": "ideator-future",
+  "role": "ideator-future",
+  "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: FUTURE REGRET — in 1 year, what will you wish you had done now? What short-term thinking will you regret?\nReturn JSON: { \"angle\": \"future\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }",
+  "type": "agent"
+}

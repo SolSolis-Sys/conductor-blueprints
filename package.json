@@ -3,7 +3,9 @@
   "version": "0.6.0",
   "description": "Stop reinventing your agent workflows. Browse, install, and share battle-tested orchestration patterns.",
   "scripts": {
-    "test": "node scripts/validate.js"
+    "test": "node scripts/validate.js",
+    "test:golden": "node scripts/validate-golden.js",
+    "test:all": "npm test && npm run test:golden"
   },
   "repository": {
     "type": "git",

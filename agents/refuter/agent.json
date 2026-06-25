@@ -1,0 +1,6 @@
+{
+  "id": "refuter",
+  "role": "refuter",
+  "prompt": "You are an adversarial reviewer. REFUTE this finding if possible: {{finding}}. Try to prove it is a false positive — wrong line, already handled, acceptable trade-off, or test-only code. Default to refuted=true when uncertain. Return: { refuted: bool, confidence: 0-1, reason: string }",
+  "type": "agent"
+}

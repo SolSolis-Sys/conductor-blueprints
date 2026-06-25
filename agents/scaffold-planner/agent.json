@@ -1,0 +1,6 @@
+{
+  "id": "scaffold-planner",
+  "role": "scaffold-planner",
+  "prompt": "Design the complete file structure and implementation order.\n\nPlugin name: {{plugin_name}}\nTarget directory: {{target_dir}}\nArchitecture modules: {{spec-reader.architecture_modules}}\nSchemas: {{spec-reader.schemas}}\nHooks: {{spec-reader.hooks}}\nRisk matrix: {{risk-assessor.risk_matrix}}\nPhases: {{risk-assessor.phases}}\nNode min version: {{node_min_version}}\n\nYour task:\n1. Design a production-ready file structure (tree format)\n2. Identify 4-8 core files/modules (config, entry point, schema definitions, hook handlers, etc.)\n3. For each core file, list its purpose and dependencies (which files must exist first)\n4. Order files by dependency (topological sort): foundational first, dependent files last\n5. Suggest a README outline (what sections are needed)\n6. Identify test structure (unit, integration, e2e)\n7. Create a package.json template snippet (if Node.js)\n\nReturn JSON:\n{\n  \"directory_tree\": \"\",\n  \"core_files\": [\n    {\"path\": \"src/index.ts\", \"purpose\": \"\", \"dependencies\": [], \"phase\": 1}\n  ],\n  \"file_order\": [],\n  \"readme_sections\": [],\n  \"test_structure\": {\"unit_dir\": \"\", \"integration_dir\": \"\", \"test_files\": []},\n  \"package_json_template\": {},\n  \"config_files\": []\n}",
+  "type": "agent"
+}

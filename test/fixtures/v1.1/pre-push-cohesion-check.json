@@ -1,0 +1,32 @@
+{
+  "blueprint_name": "pre-push-cohesion-check",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 4,
+  "gates": [
+    {
+      "id": "g1-structure-auditor",
+      "type": "agent",
+      "role": "structure-auditor",
+      "prompt": "For each repo in {{repos}}, verify that these files exist at the repository root: README.md, CHANGELOG.md, LICENSE, .gitignore. Exclude venv/ node_modules/ __pycache__ .git from any filesystem traversal. For each repo, return: { repo: string, missing_files: string[], status: \"ok\" | \"missing\" }. If any file is missing, flag status as \"missing\" and list which ones."
+    },
+    {
+      "id": "g2-schema-validator",
+      "type": "agent",
+      "role": "schema-validator",
+      "prompt": "Check version consistency across the repos in {{repos}}. For each repo that contains a blueprint.json, compare its top-level version field against the corresponding entry in catalog.json. A mismatch means the catalog entry is out of sync with the blueprint source. Exclude venv/ node_modules/ __pycache__ .git from any search. Return: { mismatches: [{repo: string, blueprint_version: string, catalog_version: string}], status: \"ok\" | \"mismatch\" }"
+    },
+    {
+      "id": "g3-scrub-checker",
+      "type": "agent",
+      "role": "scrub-checker",
+      "prompt": "Scan the repos in {{repos}} for private or sensitive content that must not appear in a public OSS push. Check for: hardcoded private IP addresses (e.g. 192.168.x.x, 10.x.x.x, 100.x.x.x Tailscale ranges), internal reference identifiers, session reference numbers, the extra patterns in {{scrub_patterns}}. Exclude venv/ node_modules/ __pycache__ .git from grep. For each match, report: { repo: string, file: string, line: number, pattern: string, snippet: string }. Return: { leaks: [...], status: \"clean\" | \"leaked\" }"
+    },
+    {
+      "id": "g4-gate-decision",
+      "type": "agent",
+      "role": "gate-decision",
+      "prompt": "Given the outputs from structure-auditor, schema-validator, and scrub-checker, produce a final push verdict.\n\nInputs:\n- Structure audit: {{structure-auditor.status}} — missing: {{structure-auditor.missing_files}}\n- Schema sync: {{schema-validator.status}} — mismatches: {{schema-validator.mismatches}}\n- Scrub: {{scrub-checker.status}} — leaks: {{scrub-checker.leaks}}\n\nVerdict rules:\n- BLOCK_PUSH if scrub-checker.status == \"leaked\" (data leak is always blocking)\n- BLOCK_PUSH if structure-auditor is missing LICENSE or README.md (non-negotiable OSS hygiene)\n- WARN_ONLY if schema-validator.status == \"mismatch\" (desync is a warning, not a blocker)\n- WARN_ONLY if structure-auditor is missing CHANGELOG.md or .gitignore only\n- PASS_PUSH if all checks are clean\n\nReturn: { verdict: \"PASS_PUSH\" | \"WARN_ONLY\" | \"BLOCK_PUSH\", reasons: string[], recommended_actions: string[] }"
+    }
+  ]
+}

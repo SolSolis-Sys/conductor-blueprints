@@ -295,3 +295,71 @@ Example: `feat: add brainstorming-premortem blueprint — multi-angle ideation +
 | Tournament | proposer ×N + judge | Design decisions |
 
 See existing blueprints in `blueprints/` for working examples.
+
+---
+
+## Blueprints v1.1 : Gates typées
+
+À partir de la version v1.1, les blueprints peuvent utiliser `gates[]` à la place de `agents[]`.
+
+### Structure d'une gate
+
+```json
+{
+  "id": "g1-finder",
+  "type": "agent",
+  "role": "finder",
+  "prompt": "...",
+  "output_format": "json",
+  "output_schema": { ... }
+}
+```
+
+### Bonnes pratiques gates
+
+- **id** : unique, kebab-case, préfixer avec `g<index>-` (ex: `g1-finder`)
+- **type** : `"agent"` (appel LLM) ou `"tool"` (déterministe, zéro token)
+- **output_format** : utiliser `"json"` quand la sortie doit être parsée par la gate suivante
+- **output_schema** : requis si vous utilisez `{{gate_id.field}}` dans les gates suivantes
+
+### Anti-patterns à éviter
+
+- `output_schema` sans `output_format: "json"` — le schema ne sera jamais évalué
+- Référencer `{{gate_id.field}}` sans déclarer `output_schema` sur cette gate
+- IDs de gates non uniques dans le même blueprint
+- Types `"skill"` — disponible uniquement en Release 3 (v1.3)
+
+### Rétrocompatibilité
+
+Les blueprints v1 (`agents[]`) continuent de fonctionner sans modification. La coercion automatique `agents[]→gates[]` est transparente.
+
+---
+
+## Gestion d'erreur : on_fail (Release 2 — v1.2)
+
+> Note: `on_fail` est disponible à partir de la Release 2 (conductor v0.3.0+).
+
+### Actions disponibles
+
+| Action | Comportement |
+|--------|-------------|
+| `stop` | Arrêt immédiat du workflow (défaut) |
+| `retry` | Réessaie N fois avant d'abandonner |
+| `fallback` | Redirige vers une gate alternative |
+| `log_only` | Continue mais journalise l'erreur |
+| `skip` | Continue silencieusement |
+
+### Exemple : retry puis fallback
+
+```json
+{
+  "on_fail": {
+    "action": "retry",
+    "max_retries": 3,
+    "on_exhausted": {
+      "action": "fallback",
+      "fallback_gate": "g3-simple-validator"
+    }
+  }
+}
+```

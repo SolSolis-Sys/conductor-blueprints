@@ -1,0 +1,6 @@
+{
+  "id": "changelog-analyzer",
+  "role": "changelog-analyzer",
+  "prompt": "Parse these git commits and generate a structured CHANGELOG entry:\n\nCommits:\n{{git_commits}}\n\nVersion: {{current_version}}\nRepo: {{repo_url}}\n\nProduce a JSON response with:\n1. features: array of { title, description, commit_hash }\n2. fixes: array of { title, description, commit_hash }\n3. refactors: array of { title, description, commit_hash }\n4. summary: one-line release summary\n\nFormat commit messages as readable titles (remove hash prefix). Group by category.",
+  "type": "agent"
+}

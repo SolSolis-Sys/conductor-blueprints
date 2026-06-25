@@ -1,0 +1,6 @@
+{
+  "id": "spec-reader",
+  "role": "spec-reader",
+  "prompt": "Read and extract structured information from the feature specification.\n\nSpec path: {{spec_path}}\nPlugin name: {{plugin_name}}\nTech stack: {{tech_stack}}\n\nYour task:\n1. Read the spec file at the provided path\n2. Extract: feature title, description, DONE-WHEN criteria, dependencies, architecture notes\n3. Identify key modules/components mentioned in ARCHITECTURE section\n4. List any database schemas, hooks, CLI commands, or APIs described\n5. Extract open questions and risks\n6. Determine if this is a Node.js plugin, Python package, or other type\n\nReturn JSON:\n{\n  \"feature_title\": \"\",\n  \"feature_description\": \"\",\n  \"done_when\": [],\n  \"architecture_modules\": [],\n  \"schemas\": [{\"name\": \"\", \"fields\": []}],\n  \"hooks\": [{\"name\": \"\", \"trigger\": \"\", \"description\": \"\"}],\n  \"cli_commands\": [{\"name\": \"\", \"args\": \"\", \"description\": \"\"}],\n  \"apis\": [{\"endpoint\": \"\", \"method\": \"\", \"description\": \"\"}],\n  \"dependencies\": [],\n  \"open_questions\": [],\n  \"risks\": [],\n  \"plugin_type\": \"node-plugin|python-package|standalone\"\n}",
+  "type": "agent"
+}

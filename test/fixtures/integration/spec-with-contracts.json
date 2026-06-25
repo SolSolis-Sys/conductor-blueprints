@@ -1,0 +1,54 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json",
+  "schema_version": "1.1.0",
+  "name": "spec-with-contracts",
+  "version": "1.0.0",
+  "title": "Test: Blueprint avec contrats inter-gates",
+  "description": "Blueprint de test pour la validation inter-gates et on_fail.",
+  "author": "solsolis",
+  "license": "MIT",
+  "gates": [
+    {
+      "id": "g1-elicitor",
+      "type": "agent",
+      "role": "elicitor",
+      "prompt": "Analyse le besoin: {{initial_idea}}",
+      "output_format": "json",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "requirements": { "type": "array", "items": { "type": "string" } },
+          "complexity": { "type": "string", "enum": ["low", "medium", "high"] }
+        },
+        "required": ["requirements", "complexity"]
+      }
+    },
+    {
+      "id": "g2-writer",
+      "type": "tool",
+      "command": "conductor://tools/write_file",
+      "params": { "path": "specs/{{g1-elicitor.complexity}}-spec.md", "content": "# Spec\n{{g1-elicitor.requirements}}" },
+      "on_fail_v1": "stop"
+    },
+    {
+      "id": "g3-validator",
+      "type": "agent",
+      "role": "validator",
+      "prompt": "Valide la spec générée: {{g1-elicitor.requirements}}",
+      "output_format": "json",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "valid": { "type": "boolean" },
+          "score": { "type": "number", "minimum": 0, "maximum": 10 }
+        },
+        "required": ["valid", "score"]
+      }
+    }
+  ],
+  "loop": {
+    "exit_condition": "g3-validator.valid == true",
+    "max_rounds": 3,
+    "on_max_rounds": "fail"
+  }
+}

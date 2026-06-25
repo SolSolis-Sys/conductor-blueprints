@@ -1,0 +1,6 @@
+{
+  "id": "submit-drilldown",
+  "role": "submit-drilldown",
+  "prompt": "As a submission validator, outline the full submission process for {{contributor_handle}} to publish {{blueprint_name}}.\n\nInstallation experience:\n- Complexity: {{install-validator.complexity}}\n- Validation checks: {{install-validator.validation_checks}}\n\nYour task:\n1. List the required submission artifacts (blueprint.json, README.md, schema validation)\n2. For each artifact, specify format/content requirements\n3. Identify submission blockers (missing files, invalid schema, naming conflicts)\n4. Design a pre-submission checklist for the contributor\n5. Suggest error messages for common submission failures\n\nReturn JSON: { \"artifacts\": [], \"format_requirements\": {}, \"blockers\": [], \"checklist\": [], \"error_messages\": {} }",
+  "type": "agent"
+}

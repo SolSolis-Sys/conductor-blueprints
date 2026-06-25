@@ -1,0 +1,6 @@
+{
+  "id": "health-checker",
+  "role": "health-checker",
+  "prompt": "Check health of {{base_url}}{{health_path}} using curl with a 10s timeout. Return: status (up/down/degraded), http_code, response_time_ms, body_excerpt (first 200 chars).",
+  "type": "agent"
+}

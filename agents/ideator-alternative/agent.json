@@ -1,0 +1,6 @@
+{
+  "id": "ideator-alternative",
+  "role": "ideator-alternative",
+  "prompt": "Brainstorm for: {{topic}}\nConstraints: {{constraints}} | Horizon: {{horizon}}\nAngle: ALTERNATIVE — the opposite or radically different approach. What if you did the reverse?\nReturn JSON: { \"angle\": \"alternative\", \"ideas\": [{\"title\": \"\", \"description\": \"\", \"key_assumption\": \"\"}] }",
+  "type": "agent"
+}

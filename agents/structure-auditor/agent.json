@@ -1,0 +1,6 @@
+{
+  "id": "structure-auditor",
+  "role": "structure-auditor",
+  "prompt": "For each repo in {{repos}}, verify that these files exist at the repository root: README.md, CHANGELOG.md, LICENSE, .gitignore. Exclude venv/ node_modules/ __pycache__ .git from any filesystem traversal. For each repo, return: { repo: string, missing_files: string[], status: \"ok\" | \"missing\" }. If any file is missing, flag status as \"missing\" and list which ones.",
+  "type": "agent"
+}

@@ -1,0 +1,48 @@
+{
+  "blueprint_name": "onboarding-external",
+  "schema_version_detected": "1.0.0",
+  "coerced": true,
+  "gate_count": 6,
+  "gates": [
+    {
+      "id": "g1-env-checker",
+      "type": "tool",
+      "role": "env-checker",
+      "command": "conductor://tools/git-status",
+      "on_fail_v1": "skip",
+      "timeout_ms": 5000
+    },
+    {
+      "id": "g2-discover-guide",
+      "type": "agent",
+      "role": "discover-guide",
+      "prompt": "You are an onboarding assistant helping {{contributor_handle}} discover conductor blueprints.\n\nContext:\n- Blueprint name: {{blueprint_name}}\n- Current repo state: {{git_status}}\n\nYour task:\n1. Explain what conductor blueprints are in one sentence\n2. List the 3 main steps: discover → install → submit\n3. Outline key benefits (reusability, multi-agent workflows, cost tracking)\n4. Suggest what tools/commands the user would need\n5. Identify potential pain points in the discovery process\n\nReturn JSON: { \"definition\": \"\", \"steps\": [], \"benefits\": [], \"required_tools\": [], \"pain_points\": [] }"
+    },
+    {
+      "id": "g3-install-validator",
+      "type": "agent",
+      "role": "install-validator",
+      "prompt": "As an installation validator, assess the installation experience for {{blueprint_name}}.\n\nPrevious findings:\n- Discovery pain points: {{discover-guide.pain_points}}\n- Required tools: {{discover-guide.required_tools}}\n\nYour task:\n1. Design the ideal installation flow (4-5 steps)\n2. For each step, identify potential blockers (permissions, dependencies, config)\n3. Suggest validation checks (schema, structure, permissions)\n4. Rate install complexity (low/medium/high)\n5. Flag any UX gotchas (unclear docs, missing steps, confusing errors)\n\nReturn JSON: { \"install_flow\": [], \"blockers\": [], \"validation_checks\": [], \"complexity\": \"low|medium|high\", \"gotchas\": [] }"
+    },
+    {
+      "id": "g4-submit-drilldown",
+      "type": "agent",
+      "role": "submit-drilldown",
+      "prompt": "As a submission validator, outline the full submission process for {{contributor_handle}} to publish {{blueprint_name}}.\n\nInstallation experience:\n- Complexity: {{install-validator.complexity}}\n- Validation checks: {{install-validator.validation_checks}}\n\nYour task:\n1. List the required submission artifacts (blueprint.json, README.md, schema validation)\n2. For each artifact, specify format/content requirements\n3. Identify submission blockers (missing files, invalid schema, naming conflicts)\n4. Design a pre-submission checklist for the contributor\n5. Suggest error messages for common submission failures\n\nReturn JSON: { \"artifacts\": [], \"format_requirements\": {}, \"blockers\": [], \"checklist\": [], \"error_messages\": {} }"
+    },
+    {
+      "id": "g5-schema-validator",
+      "type": "tool",
+      "role": "schema-validator",
+      "command": "conductor://tools/validate-schema D:\\HYPERION\\conductor-blueprints\\blueprints\\onboarding-external\\blueprint.json",
+      "on_fail_v1": "skip",
+      "timeout_ms": 5000
+    },
+    {
+      "id": "g6-onboarding-verdict",
+      "type": "agent",
+      "role": "onboarding-verdict",
+      "prompt": "As the final validator, produce an onboarding verdict.\n\nOnboarding summary:\n- Discovery guide: {{discover-guide}}\n- Install validator results: {{install-validator}}\n- Submission requirements: {{submit-drilldown}}\n- Schema validation: {{schema_validation}}\n\nYour task:\n1. Rate overall onboarding UX (1-10)\n2. Summarize the three phases (discover, install, submit) with one sentence each\n3. Identify the top 3 improvements needed\n4. Assess blockers for new contributors (technical skill, documentation clarity, tooling)\n5. Final recommendation: SMOOTH (ready for external contributors) or NEEDS_IMPROVEMENT (gaps exist)\n\nReturn JSON: { \"ux_score\": 0, \"phases_summary\": {\"discover\": \"\", \"install\": \"\", \"submit\": \"\"}, \"top_improvements\": [], \"contributor_blockers\": [], \"recommendation\": \"SMOOTH|NEEDS_IMPROVEMENT\" }"
+    }
+  ]
+}

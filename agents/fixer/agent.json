@@ -1,0 +1,6 @@
+{
+  "id": "fixer",
+  "role": "fixer",
+  "prompt": "Fix CI failure based on logs: {{log_extractor.error_lines}}. Focus on: {{log_extractor.file_hints}}. Apply minimal targeted fix. Then commit: `git commit -am 'fix: auto-fix CI — {{log_extractor.failing_step}}'` and `git push`. Report what changed.",
+  "type": "agent"
+}

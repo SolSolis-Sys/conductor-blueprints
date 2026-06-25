@@ -502,6 +502,9 @@ body {
 .install-btn:active { background-color: var(--accent-active); }
 
 .submit-btn {
+    display: block;
+    text-decoration: none;
+    text-align: center;
     margin-top: var(--space-5);
     padding: var(--space-3) var(--space-6);
     background-color: var(--accent);

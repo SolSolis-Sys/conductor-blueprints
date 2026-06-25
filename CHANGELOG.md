@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] — 2026-06-25
+
+### Added — Phase 0 : Monorepo fondation
+- `agents/<role>/agent.json` × 46 — prompts extraits depuis 13 blueprints
+- `tools/write_file`, `tools/read_file`, `tools/validate_schema` — manifestes déclaratifs
+- `skills/`, `cookbooks/` — dossiers prêts pour Release 3 (skills gates)
+- `catalog.json` — section artefacts (agents/tools), schema_version supprimé (non utilisé par scripts)
+
+### Added — Phase 1 (Release 1 — v1.1) : Gates typées
+- `schemas/blueprint.v1.1.json` — gates[], id/type/role/prompt/output_schema, if/then/else, loop.max_rounds typé
+- `test/fixtures/v1.1/` × 13 golden files — référence coercion agents[]→gates[]
+- `scripts/validate-golden.js` — 13/13 OK, support blueprints v1.1 natifs, command comparé
+- `.github/workflows/ci.yml` — step test:golden ajouté
+- `docs/CREATE-BLUEPRINT.md` — sections "Gates typées v1.1" et "on_fail (Release 2)"
+
+### Fixed
+- `validate-golden.js` : rejet erroné des blueprints v1.1 natifs (gates[] sans agents[])
+- `validate-golden.js` : command non comparé pour gates type:tool (faux positif fetch-web corrigé)
+- `schemas/blueprint.v1.1.json` : if/then/else enforce role+prompt pour agent, command pour tool
+- `schemas/blueprint.v1.1.json` : loop.max_rounds — type integer|string + minimum:1 ajoutés
+
 ## [1.9.0] — 2026-06-21
 
 ### Added

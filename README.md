@@ -17,6 +17,18 @@ If you've used Claude Code's loops or ultracode workflows to automate tasks, blu
 conductor hub install <blueprint-name>
 ```
 
+## Repository Structure
+
+- **`blueprints/<name>/`** — Full blueprint definitions (blueprint.json, README.md, tests)
+- **`agents/<role>/`** — Reusable agent prompts extracted across blueprints (46 modules)
+- **`tools/`** — Declarative tool manifests: `write_file`, `read_file`, `validate_schema`
+- **`skills/`** — Ready for Release 3 (Skills gates integration)
+- **`cookbooks/`** — Ready for Release 3 (Common workflows and patterns)
+- **`schemas/blueprint.v1.1.json`** — JSON Schema for v1.1 blueprints with typed gates, if/then/else, and output_schema
+- **`test/fixtures/v1.1/`** — 13 golden files validating agent→gate coercion
+- **`scripts/validate-golden.js`** — CI validation: blueprint schema, golden files, deterministic tool steps
+- **`catalog.json`** — Registry of all available blueprints with metadata
+
 ![Blueprints](https://img.shields.io/badge/blueprints-12-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 

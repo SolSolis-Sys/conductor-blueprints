@@ -146,6 +146,16 @@
         "type": "object",
         "required": ["id", "type"],
         "additionalProperties": true,
+        "if": {
+          "properties": { "type": { "const": "agent" } },
+          "required": ["type"]
+        },
+        "then": {
+          "required": ["id", "type", "role", "prompt"]
+        },
+        "else": {
+          "required": ["id", "type", "command"]
+        },
         "properties": {
           "id": {
             "type": "string",
@@ -215,6 +225,8 @@
         },
         "max_rounds": {
           "description": "Safety cap. Recommended: 1-10. Use {{input_name}} for user-configurable cap.",
+          "type": ["integer", "string"],
+          "minimum": 1,
           "maximum": 100
         },
         "trigger": { "type": "string" },

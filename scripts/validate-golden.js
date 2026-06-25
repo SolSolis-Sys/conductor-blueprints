@@ -82,9 +82,9 @@ function coerceAgentsToGates(agents) {
 
 /**
  * Compare the identity fields of a generated gate vs a golden gate.
- * We compare: id, type, role, parallel (if present), condition (if present).
+ * We compare: id, type, role, parallel (if present), condition (if present),
+ * command (if gate type is 'tool').
  * Prompt comparison is skipped (golden files may truncate long prompts).
- * command is compared for tool-type gates.
  */
 function compareGate(generated, golden, idx) {
   const diffs = [];
@@ -93,6 +93,13 @@ function compareGate(generated, golden, idx) {
   for (const f of fields) {
     if (generated[f] !== golden[f]) {
       diffs.push(`  gate[${idx}].${f}: expected "${golden[f]}", got "${generated[f]}"`);
+    }
+  }
+
+  // command: compare for tool-type gates
+  if (golden.type === 'tool' || generated.type === 'tool') {
+    if (generated.command !== golden.command) {
+      diffs.push(`  gate[${idx}].command: expected "${golden.command}", got "${generated.command}"`);
     }
   }
 
@@ -173,14 +180,19 @@ function main() {
       continue;
     }
 
-    if (!Array.isArray(blueprint.agents) || blueprint.agents.length === 0) {
-      console.log(`FAIL ${blueprintName}: blueprint has no agents[]`);
+    // Determine blueprint format: native v1.1 (gates[] only) vs v1 (agents[] → coercion)
+    const isNativeV11 = Array.isArray(blueprint.gates) && blueprint.gates.length > 0 && !Array.isArray(blueprint.agents);
+
+    if (!isNativeV11 && (!Array.isArray(blueprint.agents) || blueprint.agents.length === 0)) {
+      console.log(`FAIL ${blueprintName}: blueprint has no agents[] and no native gates[]`);
       failCount++;
       continue;
     }
 
-    // Generate gates via coercion
-    const generatedGates = coerceAgentsToGates(blueprint.agents);
+    // Generate or use gates directly
+    const generatedGates = isNativeV11
+      ? blueprint.gates
+      : coerceAgentsToGates(blueprint.agents);
 
     // Check gate count
     const allDiffs = [];

@@ -16,7 +16,7 @@
       "id": "g2-rag-content-scanner",
       "type": "tool",
       "role": "rag-content-scanner",
-      "command": "for file in $(find {{rag_dir}} -type f \\( -name '*.txt' -o -name '*.md' \\) 2>/dev/null | head -10); do echo \"=== $file ===\" && head -100 \"$file\"; done",
+      "command": "for file in $(find {{rag_dir}} -type f \\( -name '*.txt' -o -name '*.md' \\) 2>/dev/null | head -10); do echo \"=== $file ===\"  && head -100 \"$file\"; done",
       "on_fail_v1": "skip",
       "timeout_ms": 10000
     },

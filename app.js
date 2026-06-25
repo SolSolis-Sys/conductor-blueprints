@@ -595,7 +595,7 @@ ${lang === 'fr'
         window.open(url, '_blank', 'noopener');
     }
 
-    submitButton.addEventListener('click', openSubmitIssue);
+    submitButton.addEventListener('click', () => window.open('web/submit.html', '_blank'));
 
     // === Bascule de langue ======================================
     function setLang(next) {

@@ -27,9 +27,9 @@ conductor hub install <blueprint-name>
 - **`schemas/blueprint.v1.1.json`** — JSON Schema for v1.1 blueprints with typed gates, if/then/else, and output_schema
 - **`test/fixtures/v1.1/`** — 13 golden files validating agent→gate coercion
 - **`scripts/validate-golden.js`** — CI validation: blueprint schema, golden files, deterministic tool steps
-- **`catalog.json`** — Registry of all available blueprints with metadata
+- **`catalog.json`** — Registry of all available blueprints with metadata. The top-level `version` field (e.g. `2.1.0`) is the **catalog format version** — bumped each time the catalog structure or blueprint list changes. It is independent from the repo version in `package.json` (e.g. `0.7.0`), which follows standard semver for the tooling itself.
 
-![Blueprints](https://img.shields.io/badge/blueprints-12-blue)
+![Blueprints](https://img.shields.io/badge/blueprints-14-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 > 🌐 Hub live → https://solsolis-sys.github.io/conductor-blueprints/
@@ -124,14 +124,20 @@ Step-by-step guide, schema reference, and security checklist: [CONTRIBUTING.md](
 
 | Name | What it does | Cost | Tags |
 |------|-------------|------|------|
-| `idea-to-spec` | Raw idea → structured feature spec with research and validation | medium | planning, spec |
-| `tdd-bug-hunter` | Adversarial TDD loop: write failing test → fix → verify | medium | tdd, bugs |
 | `adversarial-review` | 3-refuter review: finding confirmed only if 2/3 fail to disprove | high | review, quality |
+| `brainstorming-premortem` | Multi-angle ideation + adversarial pre-mortem | medium | brainstorming, planning |
 | `ci-polling` | Poll CI, extract failures, auto-fix, loop until green | low | ci, automation |
-| `brainstorming-premortem` | Multi-angle ideation + adversarial pre-mortem | high | brainstorming, planning |
-| `deploy-verify` | Post-deploy health polling with smoke tests and optional auto-rollback | medium | deploy, devops |
+| `conductor-loop-improvement` | Audits and improves the loop config of an existing blueprint (exit conditions, max_rounds) | low | conductor, loop, meta |
+| `deploy-verify` | Post-deploy health polling with smoke tests and optional auto-rollback | low | deploy, devops |
+| `docs-sync` | Automates CHANGELOG, README, and roadmap updates after releases | low | documentation, release |
+| `fetch-web` | Deterministic web fetching pipeline with LLM synthesis, RAG-first cache check | low | research, rag, web |
+| `idea-to-spec` | Raw idea → structured feature spec with research and validation | medium | planning, spec |
+| `onboarding-external` | Simulates the full onboarding journey for a new external user end-to-end | low | onboarding, ux |
 | `pre-push-cohesion-check` | Cross-repo consistency check before pushing: README, CHANGELOG, schemas, anti-leak scrub | low | pre-push, security |
+| `produce-html-page` | Generate a static HTML page from a spec: design → implement → verify | medium | html, frontend |
 | `self-skill-improvement` | Reads a SKILL.md, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP | medium | skill, meta |
+| `spec-to-feature` | Transforms a structured feature spec into implementation scaffold with tasks and tickets | medium | spec, scaffold, planning |
+| `tdd-bug-hunter` | Adversarial TDD loop: write failing test → fix → verify | medium | tdd, bugs |
 
 ---
 

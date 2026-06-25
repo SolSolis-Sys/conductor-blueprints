@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs/CREATE-BLUEPRINT.md` — sections "Gates typées v1.1" et "on_fail (Release 2)"
 
 ### Fixed
+- `README.md` : badge blueprints-12 corrigé → blueprints-14 (14 blueprints dans catalog.json)
+- `README.md` : table Blueprint Catalog complétée — 6 blueprints manquants ajoutés (conductor-loop-improvement, docs-sync, fetch-web, onboarding-external, produce-html-page, spec-to-feature)
+- `README.md` : note ajoutée sur `catalog.json version` (format catalog) vs `package.json version` (repo) pour clarifier la distinction
 - `validate-golden.js` : rejet erroné des blueprints v1.1 natifs (gates[] sans agents[])
 - `validate-golden.js` : command non comparé pour gates type:tool (faux positif fetch-web corrigé)
 - `schemas/blueprint.v1.1.json` : if/then/else enforce role+prompt pour agent, command pour tool

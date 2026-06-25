@@ -591,13 +591,13 @@
 
           <!-- GitHub URL -->
           <div class="field">
-            <label class="field-label" for="field-github-url">Blueprint URL</label>
+            <label class="field-label" for="field-github-url">Source repo URL (optional)</label>
             <input
               type="url"
               id="field-github-url"
               name="github_url"
               autocomplete="off"
-              placeholder="https://github.com/author/repo/blueprint.json"
+              placeholder="https://github.com/your-org/your-repo (optional)"
               aria-describedby="hint-github-url"
             >
             <span class="field-hint" id="hint-github-url">Direct link to the <code>.json</code> file</span>
@@ -608,6 +608,9 @@
         <div class="btn-row">
           <button type="button" class="btn btn-secondary" id="btn-preview" aria-controls="json-preview">
             Preview JSON
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-download" aria-label="Download blueprint as JSON file">
+            Download blueprint.json
           </button>
           <button type="button" class="btn btn-primary" id="btn-submit-issue" aria-label="Open GitHub issue with prefilled blueprint data">
             Submit Issue ↗
@@ -782,6 +785,25 @@
       }
     });
 
+    /* Download blueprint.json */
+    document.getElementById('btn-download').addEventListener('click', () => {
+      const data = readFormData();
+      const stub = buildStub(data);
+      const json = JSON.stringify(stub, null, 2);
+      const filename = (data.name || 'blueprint') + '.json';
+
+      const blob = new Blob([json], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded ' + filename);
+    });
+
     /* Submit Issue — open GitHub new issue with prefilled body */
     document.getElementById('btn-submit-issue').addEventListener('click', () => {
       const data = readFormData();
@@ -804,6 +826,10 @@
       const body = [
         '## Blueprint submission',
         '',
+        '**Description:** ' + data.description,
+        '',
+        '### Generated JSON',
+        '',
         '```json',
         JSON.stringify(stub, null, 2),
         '```',
@@ -812,9 +838,9 @@
         '_Submitted via [submit.html](https://github.com/SolSolis-Sys/conductor-blueprints/blob/main/web/submit.html)_'
       ].join('\n');
 
-      const title = encodeURIComponent('[Blueprint] ' + (data.name || 'new-blueprint'));
-      const bodyEnc = encodeURIComponent(body);
-      const labels = encodeURIComponent('blueprint-submission');
+      const title    = encodeURIComponent('[Blueprint] ' + (data.name || 'new-blueprint'));
+      const bodyEnc  = encodeURIComponent(body);
+      const labels   = encodeURIComponent('blueprint-submission');
       const url = `https://github.com/SolSolis-Sys/conductor-blueprints/issues/new?title=${title}&body=${bodyEnc}&labels=${labels}`;
 
       window.open(url, '_blank', 'noopener,noreferrer');

@@ -1,0 +1,40 @@
+{
+  "id": "changelog-extractor",
+  "type": "tool",
+  "description": "Extracts structured commit history from a git repository between two refs. Filters by conventional commit prefixes (feat, fix, refactor, chore, perf, docs).",
+  "params": {
+    "repo_path": { "type": "string", "required": true, "description": "Absolute or relative path to the git repository root" },
+    "from_ref": { "type": "string", "required": false, "description": "Starting git ref (tag, SHA, or branch). Defaults to last tag.", "default": "auto" },
+    "to_ref": { "type": "string", "required": false, "description": "Ending git ref. Defaults to HEAD.", "default": "HEAD" },
+    "prefixes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": ["feat", "fix", "refactor", "chore", "perf", "docs"],
+      "description": "Conventional commit prefixes to include"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "commits": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "hash": { "type": "string" },
+            "prefix": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "required": ["hash", "prefix", "message"]
+        }
+      },
+      "from_ref": { "type": "string" },
+      "to_ref": { "type": "string" },
+      "error": { "type": "string" }
+    },
+    "required": ["success"]
+  },
+  "implementation": "lib/blueprint/tool/changelog-extractor.js",
+  "permissions": { "filesystem": "read-only" }
+}

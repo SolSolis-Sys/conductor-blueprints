@@ -1,0 +1,76 @@
+{
+  "id": "schema-validator",
+  "type": "tool",
+  "description": "Validates one or more JSON objects or files against a JSON Schema draft-07. Returns a detailed per-instance report with error paths, messages, and a severity-aware summary. Richer than validate_schema: supports file input, batch mode, and severity levels.",
+  "params": {
+    "targets": {
+      "type": "array",
+      "required": true,
+      "description": "Items to validate. Each item is either an inline object or a file path string.",
+      "items": {
+        "oneOf": [
+          { "type": "object", "description": "Inline JSON data to validate" },
+          { "type": "string", "description": "File path to a JSON file to validate" }
+        ]
+      }
+    },
+    "schema": {
+      "oneOf": [
+        { "type": "object", "description": "Inline JSON Schema draft-07" },
+        { "type": "string", "description": "File path to a JSON Schema draft-07 file" }
+      ],
+      "required": true,
+      "description": "Schema to validate against (inline object or file path)"
+    },
+    "stop_on_first_error": { "type": "boolean", "default": false, "description": "If true, abort validation on first invalid target" },
+    "severity": {
+      "type": "string",
+      "enum": ["error", "warning"],
+      "default": "error",
+      "description": "Treat validation failures as errors or warnings in the report"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "all_valid": { "type": "boolean" },
+      "report": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "target": { "type": "string", "description": "Index, filename, or inline reference" },
+            "valid": { "type": "boolean" },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": { "type": "string", "description": "JSON pointer to failing property" },
+                  "message": { "type": "string" },
+                  "keyword": { "type": "string" }
+                },
+                "required": ["path", "message"]
+              }
+            }
+          },
+          "required": ["target", "valid"]
+        }
+      },
+      "summary": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "number" },
+          "valid": { "type": "number" },
+          "invalid": { "type": "number" }
+        },
+        "required": ["total", "valid", "invalid"]
+      },
+      "error": { "type": "string" }
+    },
+    "required": ["success", "all_valid", "report", "summary"]
+  },
+  "implementation": "lib/blueprint/tool/schema-validator.js",
+  "permissions": { "filesystem": "read-only" }
+}

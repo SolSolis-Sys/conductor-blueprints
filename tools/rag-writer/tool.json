@@ -1,0 +1,29 @@
+{
+  "id": "rag-writer",
+  "type": "tool",
+  "description": "Persists a query result into the local RAG cache as a Markdown file. Creates the cache directory if absent. Last step of the RAG chain.",
+  "params": {
+    "rag_dir": { "type": "string", "required": true, "description": "Path to the RAG cache directory. Created if it does not exist." },
+    "query": { "type": "string", "required": true, "description": "Original research query, written into the file header" },
+    "content": { "type": "string", "required": true, "description": "Synthesized content to cache" },
+    "filename_prefix": { "type": "string", "default": "query", "description": "Prefix for the generated filename (e.g. 'query' → 'query_1719000000.md')" },
+    "sources": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "List of source URLs or file paths appended as a Sources section"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "cached_path": { "type": "string", "description": "Full path of the written cache file" },
+      "bytes_written": { "type": "number" },
+      "error": { "type": "string" }
+    },
+    "required": ["success"]
+  },
+  "implementation": "lib/blueprint/tool/rag-writer.js",
+  "permissions": { "filesystem": "read-write" }
+}

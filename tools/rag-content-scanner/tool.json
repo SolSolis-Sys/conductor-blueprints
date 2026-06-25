@@ -1,0 +1,29 @@
+{
+  "id": "rag-content-scanner",
+  "type": "tool",
+  "description": "Reads and concatenates content from RAG cache files returned by rag-checker. Truncates each file to a configurable head size to fit context windows.",
+  "params": {
+    "files": {
+      "type": "array",
+      "items": { "type": "string" },
+      "required": true,
+      "description": "List of file paths to read (typically output of rag-checker)"
+    },
+    "max_files": { "type": "number", "default": 10, "description": "Cap on files to actually read (prevents context overflow)" },
+    "head_lines": { "type": "number", "default": 100, "description": "Lines to read from the top of each file" },
+    "separator": { "type": "string", "default": "=== {filename} ===", "description": "Template for the separator inserted between files. Use {filename} as placeholder." }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "content": { "type": "string", "description": "Concatenated content of all scanned files with separators" },
+      "files_read": { "type": "number" },
+      "total_lines": { "type": "number" },
+      "error": { "type": "string" }
+    },
+    "required": ["success", "content"]
+  },
+  "implementation": "lib/blueprint/tool/rag-content-scanner.js",
+  "permissions": { "filesystem": "read-only" }
+}

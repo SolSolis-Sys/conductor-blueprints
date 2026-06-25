@@ -1,0 +1,48 @@
+{
+  "id": "env-checker",
+  "type": "tool",
+  "description": "Checks that required environment variables are present and optionally validates their format. Returns missing keys and validation errors without exposing values.",
+  "params": {
+    "required_vars": {
+      "type": "array",
+      "items": { "type": "string" },
+      "required": true,
+      "description": "List of environment variable names that must be set"
+    },
+    "optional_vars": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "List of environment variable names to report if absent (non-blocking)"
+    },
+    "patterns": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "default": {},
+      "description": "Map of variable name to regex pattern for format validation (e.g. {\"PORT\": \"^[0-9]+$\"})"
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "missing_required": { "type": "array", "items": { "type": "string" } },
+      "missing_optional": { "type": "array", "items": { "type": "string" } },
+      "invalid_format": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "var": { "type": "string" },
+            "pattern": { "type": "string" }
+          },
+          "required": ["var", "pattern"]
+        }
+      },
+      "all_present": { "type": "boolean" }
+    },
+    "required": ["success", "missing_required", "all_present"]
+  },
+  "implementation": "lib/blueprint/tool/env-checker.js",
+  "permissions": { "filesystem": "none" }
+}

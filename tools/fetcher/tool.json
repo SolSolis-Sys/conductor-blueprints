@@ -1,0 +1,42 @@
+{
+  "id": "fetcher",
+  "type": "tool",
+  "description": "Fetches one or more URLs via HTTP GET and returns raw content. Supports timeout, user-agent override, and per-URL error isolation.",
+  "params": {
+    "urls": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" },
+      "required": true,
+      "description": "List of URLs to fetch (max 10)"
+    },
+    "timeout_ms": { "type": "number", "default": 15000, "description": "Per-request timeout in milliseconds" },
+    "max_bytes": { "type": "number", "default": 204800, "description": "Max response body size per URL in bytes (default 200 KB)" },
+    "user_agent": { "type": "string", "default": "conductor-fetcher/1.0", "description": "User-Agent header sent with each request" },
+    "follow_redirects": { "type": "boolean", "default": true, "description": "Whether to follow HTTP redirects" }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "results": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "url": { "type": "string" },
+            "status_code": { "type": "number" },
+            "content": { "type": "string" },
+            "error": { "type": "string" },
+            "bytes": { "type": "number" }
+          },
+          "required": ["url"]
+        }
+      },
+      "fetch_count": { "type": "number" },
+      "error_count": { "type": "number" }
+    },
+    "required": ["success", "results"]
+  },
+  "implementation": "lib/blueprint/tool/fetcher.js",
+  "permissions": { "network": true, "filesystem": "none" }
+}

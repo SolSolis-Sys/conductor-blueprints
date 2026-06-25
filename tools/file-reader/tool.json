@@ -1,0 +1,42 @@
+{
+  "id": "file-reader",
+  "type": "tool",
+  "description": "Reads one or more files from the local filesystem. Supports glob patterns, line range slicing, and encoding selection. Never traverses venv/ node_modules/ __pycache__ .git.",
+  "params": {
+    "paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "required": true,
+      "description": "List of file paths or glob patterns to read"
+    },
+    "encoding": { "type": "string", "default": "utf8", "description": "File encoding (utf8, latin1, base64)" },
+    "line_start": { "type": "number", "default": 1, "description": "First line to include (1-indexed)" },
+    "line_end": { "type": "number", "description": "Last line to include. Omit to read to end of file." },
+    "max_bytes_per_file": { "type": "number", "default": 102400, "description": "Truncate each file at this many bytes (default 100 KB)" }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "files": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "content": { "type": "string" },
+            "lines": { "type": "number" },
+            "truncated": { "type": "boolean" },
+            "error": { "type": "string" }
+          },
+          "required": ["path"]
+        }
+      },
+      "read_count": { "type": "number" },
+      "error_count": { "type": "number" }
+    },
+    "required": ["success", "files"]
+  },
+  "implementation": "lib/blueprint/tool/file-reader.js",
+  "permissions": { "filesystem": "read-only" }
+}

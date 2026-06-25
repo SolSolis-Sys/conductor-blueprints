@@ -1,0 +1,32 @@
+{
+  "id": "rag-checker",
+  "type": "tool",
+  "description": "Scans a local RAG cache directory and returns a list of cached files matching given extensions. First step of the RAG chain before content scanning.",
+  "params": {
+    "rag_dir": { "type": "string", "required": true, "description": "Path to the RAG cache directory to scan" },
+    "extensions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [".txt", ".md"],
+      "description": "File extensions to include in the listing"
+    },
+    "max_files": { "type": "number", "default": 20, "description": "Maximum number of files to return" }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "files": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Paths of matching files found in rag_dir"
+      },
+      "file_count": { "type": "number" },
+      "dir_exists": { "type": "boolean" },
+      "error": { "type": "string" }
+    },
+    "required": ["success", "files", "dir_exists"]
+  },
+  "implementation": "lib/blueprint/tool/rag-checker.js",
+  "permissions": { "filesystem": "read-only" }
+}

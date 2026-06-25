@@ -1,0 +1,66 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/produce-html-page",
+  "name": "produce-html-page",
+  "version": "1.0.0",
+  "title": "Produce HTML Page",
+  "description": "Generate a static HTML page from a spec: design → implement → verify. Generic and reusable for any HTML page type.",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["html", "web", "generation", "frontend", "static", "documentation"],
+  "inputs": [
+    {
+      "name": "PAGE_NAME",
+      "type": "string",
+      "description": "Identifier / filename for the page (e.g. submit, index, dashboard)",
+      "required": true
+    },
+    {
+      "name": "PAGE_DESCRIPTION",
+      "type": "string",
+      "description": "One-paragraph description of what the page does and who uses it",
+      "required": true
+    },
+    {
+      "name": "TARGET_PATH",
+      "type": "string",
+      "description": "Absolute path where the HTML file must be written",
+      "required": true
+    },
+    {
+      "name": "FEATURES",
+      "type": "string",
+      "description": "Comma-separated list of features/sections to include (e.g. form,json-viewer,nav,footer)",
+      "required": false,
+      "default": "nav,footer"
+    }
+  ],
+  "cost_profile": {
+    "tier": "medium",
+    "avg_tokens_per_run": 25000,
+    "estimated_cost_usd": 0.08
+  },
+  "permissions": {
+    "network": false,
+    "filesystem": "read-write",
+    "allowed_commands": ["mkdir"]
+  },
+  "agents": [
+    {
+      "role": "designer",
+      "prompt": "Design the structure of a HTML page named '{{PAGE_NAME}}'. Purpose: {{PAGE_DESCRIPTION}}. Features to include: {{FEATURES}}. Produce: (1) semantic HTML5 structure outline, (2) list of CSS classes needed, (3) list of JS interactions required, (4) accessibility requirements (WCAG 2.1 AA). No code yet — design only."
+    },
+    {
+      "role": "implementer",
+      "prompt": "Implement the complete HTML page based on the designer's spec. Target: {{TARGET_PATH}}. Requirements: (1) single self-contained HTML file, (2) embedded CSS in <style> tag, (3) embedded JS in <script> tag, (4) no external CDN dependencies, (5) responsive mobile-first, (6) accessible (aria labels, semantic tags). Features: {{FEATURES}}. Write the complete file to {{TARGET_PATH}}."
+    },
+    {
+      "role": "verifier",
+      "prompt": "Verify the HTML page at {{TARGET_PATH}}. Check: (1) file exists and is readable, (2) valid HTML5 structure (doctype, head, body), (3) all FEATURES present: {{FEATURES}}, (4) no broken <script> or <style> syntax, (5) no external CDN links, (6) title matches {{PAGE_NAME}}, (7) basic accessibility: lang attribute, alt on images, form labels. Report: PASS/FAIL with details."
+    }
+  ],
+  "loop": {
+    "exit_condition": "verifier reports PASS",
+    "max_rounds": 2
+  }
+}

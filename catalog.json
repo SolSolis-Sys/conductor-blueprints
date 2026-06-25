@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "artefacts": {
     "agents": [
       "adversarial-reviewer",
@@ -49,58 +49,18 @@
       "verifier",
       "watcher"
     ],
-    "tools": ["write_file", "read_file", "validate_schema"]
+    "tools": [
+      "write_file",
+      "read_file",
+      "validate_schema"
+    ]
   },
   "blueprints": [
-    {
-      "id": "solfoundy/idea-to-spec",
-      "name": "idea-to-spec",
-      "version": "1.0.2",
-      "description": "Transform a raw idea into a structured feature spec with research, integration analysis, and validation.",
-      "author": "SolFoundy",
-      "tags": [
-        "planning",
-        "spec",
-        "idea-to-spec",
-        "backlog",
-        "feature"
-      ],
-      "cost_tier": "medium"
-    },
-    {
-      "id": "solfoundy/spec-to-feature",
-      "name": "spec-to-feature",
-      "version": "1.0.0",
-      "description": "Transforms a structured feature spec (T-*.md format) into a production-ready feature scaffold with file structure, risk assessment, and decomposed tasks.",
-      "author": "SolFoundy",
-      "tags": [
-        "spec",
-        "scaffold",
-        "planning",
-        "feature",
-        "production",
-        "tickets"
-      ],
-      "cost_tier": "medium"
-    },
-    {
-      "id": "solsolis/tdd-bug-hunter",
-      "name": "tdd-bug-hunter",
-      "version": "1.0.0",
-      "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
-      "author": "SolSolis-Sys",
-      "tags": [
-        "tdd",
-        "bugs",
-        "adversarial"
-      ],
-      "cost_tier": "medium"
-    },
     {
       "id": "solsolis/adversarial-review",
       "name": "adversarial-review",
       "version": "1.1.0",
-      "description": "Multi-perspective code review with N independent refuters — only surviving findings are reported",
+      "description": "Multi-perspective code review: one agent finds issues, N independent refuters try to disprove each. Only findings that survive the adversarial panel are reported.",
       "author": "SolSolis-Sys",
       "tags": [
         "review",
@@ -111,39 +71,10 @@
       "cost_tier": "high"
     },
     {
-      "id": "solsolis/ci-polling",
-      "name": "ci-polling",
-      "version": "1.1.0",
-      "description": "Polls CI status, extracts failure logs, applies auto-fix, loops until green",
-      "author": "SolSolis-Sys",
-      "tags": [
-        "ci",
-        "polling",
-        "automation",
-        "auto-fix"
-      ],
-      "cost_tier": "low"
-    },
-    {
-      "id": "solsolis/deploy-verify",
-      "name": "deploy-verify",
-      "version": "1.0.0",
-      "description": "Post-deploy health polling loop with smoke tests and optional auto-rollback",
-      "author": "SolSolis-Sys",
-      "tags": [
-        "deploy",
-        "verification",
-        "health-check",
-        "smoke-test",
-        "devops"
-      ],
-      "cost_tier": "low"
-    },
-    {
       "id": "solsolis/brainstorming-premortem",
       "name": "brainstorming-premortem",
       "version": "1.0.0",
-      "description": "Multi-angle idea generation followed by adversarial pre-mortem: surfaces risks before committing to a plan",
+      "description": "Multi-angle idea generation followed by adversarial pre-mortem: surfaces risks before committing to a plan.",
       "author": "SolSolis-Sys",
       "tags": [
         "brainstorming",
@@ -155,41 +86,25 @@
       "cost_tier": "medium"
     },
     {
-      "id": "solsolis/pre-push-cohesion-check",
-      "name": "pre-push-cohesion-check",
-      "version": "1.0.0",
-      "description": "Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, scrub anti-leak",
+      "id": "solsolis/ci-polling",
+      "name": "ci-polling",
+      "version": "1.1.0",
+      "description": "Polls CI status on a branch. On failure: extracts logs, feeds Claude, applies minimal fix, commits and re-pushes. Loops until green or max attempts. Inspired by loops.elorm.xyz 'Ship PR Until Green' pattern.",
       "author": "SolSolis-Sys",
       "tags": [
-        "pre-push",
-        "quality",
-        "cohesion",
-        "oss",
-        "security",
-        "scrub"
+        "ci",
+        "polling",
+        "automation",
+        "auto-fix",
+        "github-actions"
       ],
       "cost_tier": "low"
-    },
-    {
-      "id": "solsolis/self-skill-improvement",
-      "name": "self-skill-improvement",
-      "version": "1.0.0",
-      "description": "Reads a SKILL.md via deterministic tool step, analyzes quality, proposes improvements, adversarial review decides ACCEPT or KEEP",
-      "author": "SolSolis-Sys",
-      "tags": [
-        "skill",
-        "self-improvement",
-        "quality",
-        "claude-code",
-        "meta"
-      ],
-      "cost_tier": "medium"
     },
     {
       "id": "solsolis/conductor-loop-improvement",
       "name": "conductor-loop-improvement",
       "version": "1.0.0",
-      "description": "Audits and improves the loop configuration of an existing conductor blueprint — surfaces infinite loop risks and unclear exit conditions",
+      "description": "Audits and improves the loop configuration of an existing conductor blueprint — surfaces infinite loop risks, unclear exit conditions, and inadequate max_rounds.",
       "author": "SolSolis-Sys",
       "tags": [
         "conductor",
@@ -201,18 +116,17 @@
       "cost_tier": "low"
     },
     {
-      "id": "solfoundy/onboarding-external",
-      "name": "onboarding-external",
+      "id": "solsolis/deploy-verify",
+      "name": "deploy-verify",
       "version": "1.0.0",
-      "description": "Simulates the complete onboarding journey for an external user discovering conductor, installing blueprints, and submitting their own. Validates UX fluidity end-to-end.",
-      "author": "SolFoundy",
+      "description": "After a deploy, polls health endpoints and runs smoke tests in a loop until stable or rollback threshold reached. Inspired by loops.elorm.xyz 'Deploy Verification Loop' pattern.",
+      "author": "SolSolis-Sys",
       "tags": [
-        "onboarding",
-        "external",
-        "ux",
-        "validation",
-        "tool",
-        "conductor"
+        "deploy",
+        "verification",
+        "health-check",
+        "smoke-test",
+        "devops"
       ],
       "cost_tier": "low"
     },
@@ -246,6 +160,113 @@
         "tool-llm-pipeline"
       ],
       "cost_tier": "low"
+    },
+    {
+      "id": "solfoundy/idea-to-spec",
+      "name": "idea-to-spec",
+      "version": "1.0.2",
+      "description": "Transform a raw idea into a structured feature specification with research, cross-module analysis, and validation. Outputs a draft spec ready for backlog grooming.",
+      "author": "SolFoundy",
+      "tags": [
+        "planning",
+        "spec",
+        "idea-to-spec",
+        "backlog",
+        "feature"
+      ],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solfoundy/onboarding-external",
+      "name": "onboarding-external",
+      "version": "1.0.0",
+      "description": "Simulates the complete onboarding journey for an external user discovering conductor, installing blueprints, and submitting their own. Validates UX fluidity end-to-end.",
+      "author": "SolFoundy",
+      "tags": [
+        "onboarding",
+        "external",
+        "ux",
+        "validation",
+        "tool",
+        "conductor"
+      ],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/pre-push-cohesion-check",
+      "name": "pre-push-cohesion-check",
+      "version": "1.0.0",
+      "description": "Validates consistency across OSS repos before pushing: README, CHANGELOG, schemas, naming, scrub anti-leak",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "pre-push",
+        "quality",
+        "cohesion",
+        "oss",
+        "security",
+        "scrub"
+      ],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/produce-html-page",
+      "name": "produce-html-page",
+      "version": "1.0.0",
+      "description": "Generate a static HTML page from a spec: design → implement → verify. Generic and reusable for any HTML page type.",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "html",
+        "web",
+        "generation",
+        "frontend",
+        "static",
+        "documentation"
+      ],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solsolis/self-skill-improvement",
+      "name": "self-skill-improvement",
+      "version": "1.0.0",
+      "description": "Reads a SKILL.md file via deterministic tool step, analyzes quality, proposes improvements, then adversarial review decides ACCEPT_IMPROVED or KEEP_ORIGINAL.",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "skill",
+        "self-improvement",
+        "quality",
+        "claude-code",
+        "meta"
+      ],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solfoundy/spec-to-feature",
+      "name": "spec-to-feature",
+      "version": "1.0.0",
+      "description": "Transforms a structured feature spec (T-*.md format) into a complete implementation scaffold with file structure, risk assessment, decomposed tasks, and ready-to-execute tickets.",
+      "author": "SolFoundy",
+      "tags": [
+        "spec",
+        "scaffold",
+        "planning",
+        "feature",
+        "production",
+        "tickets"
+      ],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solsolis/tdd-bug-hunter",
+      "name": "tdd-bug-hunter",
+      "version": "1.0.0",
+      "description": "Adversarial TDD loop: write failing test → fix → verify → repeat until dry",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "tdd",
+        "bugs",
+        "adversarial"
+      ],
+      "cost_tier": "medium"
     }
   ]
 }

@@ -7,3 +7,6 @@ Thumbs.db
 dist/
 build/
 .cache/
+output.txt
+run-test.ps1
+package-lock.json

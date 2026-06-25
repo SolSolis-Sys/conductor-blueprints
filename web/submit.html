@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit a Blueprint — Conductor Blueprints Hub</title>
+  <style>
+    /* ─── Atelier Zero tokens (self-contained copy) ─────────────────────── */
+    :root {
+      --bg: #ffffff;
+      --surface: #f7f7f7;
+      --surface-warm: #eeeeee;
+      --paper-bone: #f7f1de;
+      --fg: #111111;
+      --fg-2: #3a3a3a;
+      --muted: #707070;
+      --border: #d9d9d9;
+      --border-soft: #eeeeee;
+      --accent: #111111;
+      --accent-on: #ffffff;
+      --accent-hover: #000000;
+      --success: #168a46;
+      --warn: #b7791f;
+      --danger: #c53030;
+      --font-display: "Helvetica Neue", Arial, sans-serif;
+      --font-body: "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SF Mono", ui-monospace, Menlo, monospace;
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 18px;
+      --text-xl: 24px;
+      --text-2xl: 36px;
+      --leading-body: 1.52;
+      --leading-tight: 1.06;
+      --tracking-display: -0.025em;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --focus-ring: 0 0 0 3px rgba(17, 17, 17, 0.18);
+      --motion-fast: 150ms;
+      --motion-base: 240ms;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+      --container-max: 860px;
+    }
+
+    /* ─── Reset ──────────────────────────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ─── Base ───────────────────────────────────────────────────────────── */
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg-2);
+      line-height: var(--leading-body);
+      font-size: var(--text-base);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--fg); text-underline-offset: 3px; }
+    a:hover { opacity: 0.7; }
+
+    /* ─── Layout ─────────────────────────────────────────────────────────── */
+    .container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0 var(--space-4);
+    }
+
+    @media (min-width: 768px) {
+      .container { padding: 0 var(--space-6); }
+    }
+
+    /* ─── Header ─────────────────────────────────────────────────────────── */
+    .page-header {
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-8) 0 var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .breadcrumb {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-4);
+    }
+
+    .breadcrumb a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover { color: var(--fg); }
+
+    .breadcrumb-sep {
+      margin: 0 var(--space-2);
+      color: var(--border);
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: var(--tracking-display);
+      line-height: var(--leading-tight);
+      color: var(--fg);
+      margin-bottom: var(--space-3);
+    }
+
+    @media (min-width: 768px) {
+      .page-title { font-size: 42px; }
+    }
+
+    .page-desc {
+      font-size: var(--text-sm);
+      color: var(--muted);
+      max-width: 520px;
+    }
+
+    /* ─── Section headings ───────────────────────────────────────────────── */
+    .section {
+      margin-bottom: var(--space-12);
+    }
+
+    .section-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    /* ─── Form ───────────────────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    @media (min-width: 768px) {
+      .form-grid-2col {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .field-label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--fg);
+    }
+
+    .field-label .required {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .field-hint {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      margin-top: calc(-1 * var(--space-1));
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-4);
+      width: 100%;
+      transition: border-color var(--motion-fast) var(--ease-standard),
+                  box-shadow var(--motion-fast) var(--ease-standard);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      outline: none;
+      border-color: var(--fg);
+      box-shadow: var(--focus-ring);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 88px;
+      line-height: var(--leading-body);
+    }
+
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23707070' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    /* ─── Buttons ────────────────────────────────────────────────────────── */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+      align-items: center;
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: var(--space-3) var(--space-5);
+      transition: background var(--motion-fast) var(--ease-standard),
+                  color var(--motion-fast) var(--ease-standard),
+                  border-color var(--motion-fast) var(--ease-standard);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-on);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--fg);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: var(--fg-2);
+    }
+
+    .btn:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    /* ─── JSON Preview ───────────────────────────────────────────────────── */
+    .json-preview-box {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-5);
+      margin-top: var(--space-5);
+      position: relative;
+    }
+
+    .json-preview-box.visible { display: block; }
+
+    .json-preview-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: var(--space-3);
+    }
+
+    .json-preview-code {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      line-height: 1.7;
+      color: var(--fg);
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .copy-json-btn {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+    }
+
+    /* ─── Divider ────────────────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border-soft);
+      margin: var(--space-12) 0;
+    }
+
+    /* ─── JSON Tree Viewer ───────────────────────────────────────────────── */
+    .viewer-input-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .json-raw-input {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      line-height: 1.65;
+      min-height: 160px;
+      resize: vertical;
+    }
+
+    .viewer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      align-items: center;
+    }
+
+    .parse-status {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .parse-status.ok { color: var(--success); }
+    .parse-status.err { color: var(--danger); }
+
+    .json-tree-box {
+      display: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-top: var(--space-5);
+    }
+
+    .json-tree-box.visible { display: block; }
+
+    .json-tree-toolbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: var(--space-2) var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .json-tree-toolbar-label {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .tree-ctrl-btn {
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      transition: background var(--motion-fast) var(--ease-standard),
+                  color var(--motion-fast) var(--ease-standard);
+    }
+
+    .tree-ctrl-btn:hover {
+      background: var(--border-soft);
+      color: var(--fg);
+    }
+
+    .json-tree-body {
+      padding: var(--space-5);
+      overflow-x: auto;
+    }
+
+    /* ─── Tree Nodes ─────────────────────────────────────────────────────── */
+    .jt-node { font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.8; }
+
+    .jt-toggler {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      line-height: inherit;
+      color: var(--fg);
+    }
+
+    .jt-arrow {
+      display: inline-block;
+      width: 14px;
+      font-size: 9px;
+      color: var(--muted);
+      transition: transform var(--motion-fast) var(--ease-standard);
+    }
+
+    .jt-arrow.open { transform: rotate(90deg); }
+
+    .jt-key { color: var(--fg); font-weight: 600; }
+    .jt-colon { color: var(--muted); margin: 0 2px; }
+
+    .jt-str  { color: #168a46; }  /* success green */
+    .jt-num  { color: #1a6fcc; }  /* blue */
+    .jt-bool { color: #b25d00; }  /* orange-brown */
+    .jt-null { color: #b91c1c; }  /* danger red — WCAG AA ≥4.5:1 */
+
+    .jt-bracket {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .jt-count {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .jt-children {
+      margin-left: 18px;
+      border-left: 1px solid var(--border-soft);
+      padding-left: var(--space-3);
+    }
+
+    .jt-children.collapsed { display: none; }
+
+    .jt-comma { color: var(--muted); }
+
+    /* ─── Toast ──────────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: var(--space-6);
+      right: var(--space-6);
+      background: var(--fg);
+      color: var(--accent-on);
+      font-size: var(--text-xs);
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-sm);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity var(--motion-base) var(--ease-standard),
+                  transform var(--motion-base) var(--ease-standard);
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────────────────── */
+    .page-footer {
+      border-top: 1px solid var(--border-soft);
+      padding: var(--space-8) 0;
+      margin-top: var(--space-12);
+      font-size: var(--text-xs);
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-footer a { color: var(--muted); }
+    .page-footer a:hover { color: var(--fg); }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
+    <header class="page-header">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../index.html">Conductor Blueprints Hub</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span>Submit</span>
+      </nav>
+      <h1 class="page-title">Submit a Blueprint</h1>
+      <p class="page-desc">Contribute a blueprint to the community registry</p>
+    </header>
+
+    <!-- ── Section 1 — Submission form ─────────────────────────────────── -->
+    <section class="section" aria-labelledby="submit-heading">
+      <h2 class="section-label" id="submit-heading">Blueprint details</h2>
+
+      <form id="blueprint-form" novalidate>
+        <div class="form-grid">
+
+          <!-- Row 1: name + author -->
+          <div class="form-grid form-grid-2col">
+            <div class="field">
+              <label class="field-label" for="field-name">
+                Name <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                type="text"
+                id="field-name"
+                name="name"
+                required
+                autocomplete="off"
+                placeholder="my-blueprint"
+                aria-describedby="hint-name"
+              >
+              <span class="field-hint" id="hint-name">Lowercase slug, no spaces</span>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="field-author">
+                Author <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                type="text"
+                id="field-author"
+                name="author"
+                required
+                autocomplete="off"
+                placeholder="GitHub handle"
+              >
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="field">
+            <label class="field-label" for="field-description">
+              Description <span class="required" aria-hidden="true">*</span>
+            </label>
+            <textarea
+              id="field-description"
+              name="description"
+              required
+              placeholder="One-liner description"
+              aria-describedby="hint-description"
+            ></textarea>
+            <span class="field-hint" id="hint-description">Keep it under 120 characters</span>
+          </div>
+
+          <!-- Row 3: tags + cost_tier -->
+          <div class="form-grid form-grid-2col">
+            <div class="field">
+              <label class="field-label" for="field-tags">Tags</label>
+              <input
+                type="text"
+                id="field-tags"
+                name="tags"
+                autocomplete="off"
+                placeholder="tag1, tag2, tag3"
+                aria-describedby="hint-tags"
+              >
+              <span class="field-hint" id="hint-tags">Comma-separated</span>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="field-cost-tier">Cost tier</label>
+              <select id="field-cost-tier" name="cost_tier" aria-label="Estimated cost tier">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- GitHub URL -->
+          <div class="field">
+            <label class="field-label" for="field-github-url">Blueprint URL</label>
+            <input
+              type="url"
+              id="field-github-url"
+              name="github_url"
+              autocomplete="off"
+              placeholder="https://github.com/author/repo/blueprint.json"
+              aria-describedby="hint-github-url"
+            >
+            <span class="field-hint" id="hint-github-url">Direct link to the <code>.json</code> file</span>
+          </div>
+
+        </div><!-- /form-grid -->
+
+        <div class="btn-row">
+          <button type="button" class="btn btn-secondary" id="btn-preview" aria-controls="json-preview">
+            Preview JSON
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-submit-issue" aria-label="Open GitHub issue with prefilled blueprint data">
+            Submit Issue ↗
+          </button>
+        </div>
+
+        <!-- JSON Preview output -->
+        <div class="json-preview-box" id="json-preview" role="region" aria-label="Generated JSON preview" aria-live="polite" aria-atomic="true">
+          <button
+            type="button"
+            class="btn btn-secondary copy-json-btn"
+            id="btn-copy-preview"
+            aria-label="Copy generated JSON to clipboard"
+          >Copy</button>
+          <p class="json-preview-label">Generated stub</p>
+          <pre class="json-preview-code" id="json-preview-code"></pre>
+        </div>
+
+      </form>
+    </section>
+
+    <hr class="divider" role="separator">
+
+    <!-- ── Section 2 — JSON Tree Viewer ─────────────────────────────────── -->
+    <section class="section" aria-labelledby="viewer-heading">
+      <h2 class="section-label" id="viewer-heading">JSON Tree Viewer</h2>
+
+      <div class="viewer-input-row">
+        <div class="field">
+          <label class="field-label" for="json-raw">Paste JSON</label>
+          <textarea
+            id="json-raw"
+            class="json-raw-input"
+            placeholder='{ "name": "my-blueprint", "version": "1.0.0" }'
+            aria-describedby="viewer-status"
+            spellcheck="false"
+          ></textarea>
+        </div>
+
+        <div class="viewer-actions">
+          <button type="button" class="btn btn-secondary" id="btn-parse" aria-controls="json-tree-box">
+            Parse &amp; View
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-copy-formatted" aria-label="Copy formatted JSON to clipboard">
+            Copy JSON
+          </button>
+          <span class="parse-status" id="viewer-status" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <!-- Tree output -->
+      <div class="json-tree-box" id="json-tree-box" role="region" aria-label="JSON tree view">
+        <div class="json-tree-toolbar">
+          <span class="json-tree-toolbar-label" id="tree-toolbar-label">Tree</span>
+          <button type="button" class="tree-ctrl-btn" id="btn-expand-all">Expand all</button>
+          <button type="button" class="tree-ctrl-btn" id="btn-collapse-all">Collapse all</button>
+        </div>
+        <div class="json-tree-body" id="json-tree-body" aria-live="polite" role="tree"></div>
+      </div>
+
+    </section>
+
+    <!-- ── Footer ──────────────────────────────────────────────────────── -->
+    <footer class="page-footer">
+      <span>Conductor Blueprints Hub</span>
+      <nav aria-label="Footer links">
+        <a href="../index.html">Registry</a>
+        &nbsp;·&nbsp;
+        <a href="https://github.com/SolSolis-Sys/conductor-blueprints" target="_blank" rel="noopener">GitHub</a>
+        &nbsp;·&nbsp;
+        <a href="../CONTRIBUTING.md">Contributing</a>
+      </nav>
+    </footer>
+
+  </div><!-- /container -->
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+  <script>
+    /* ================================================================
+     * Conductor Blueprints — submit.html
+     * Section 1 : Blueprint form (Preview JSON + Submit Issue)
+     * Section 2 : JSON Tree Viewer (collapsible, no dependencies)
+     * ============================================================== */
+
+    /* ── Toast helper ─────────────────────────────────────────────── */
+    const toastEl = document.getElementById('toast');
+    let toastTimer = null;
+
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 4000);
+    }
+
+    /* ── Copy to clipboard helper ─────────────────────────────────── */
+    function copyText(text, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(label + ' copied to clipboard');
+      }).catch(() => {
+        // fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (_) { ok = false; }
+        document.body.removeChild(ta);
+        if (ok) {
+          showToast(label + ' copied to clipboard');
+        } else {
+          showToast('Copy failed — select text and copy manually');
+        }
+      });
+    }
+
+    /* ================================================================
+     * SECTION 1 — Blueprint submission form
+     * ============================================================== */
+
+    function readFormData() {
+      return {
+        name:        document.getElementById('field-name').value.trim(),
+        description: document.getElementById('field-description').value.trim(),
+        author:      document.getElementById('field-author').value.trim(),
+        tags:        document.getElementById('field-tags').value
+                       .split(',')
+                       .map(t => t.trim())
+                       .filter(Boolean),
+        cost_tier:   document.getElementById('field-cost-tier').value,
+        github_url:  document.getElementById('field-github-url').value.trim()
+      };
+    }
+
+    function buildStub(data) {
+      return {
+        name:        data.name        || 'my-blueprint',
+        description: data.description || '',
+        author:      data.author      || '',
+        version:     '1.0.0',
+        tags:        data.tags.length ? data.tags : [],
+        cost_tier:   data.cost_tier,
+        github_url:  data.github_url  || '',
+        created_at:  new Date().toISOString().slice(0, 10)
+      };
+    }
+
+    /* Preview JSON */
+    document.getElementById('btn-preview').addEventListener('click', () => {
+      const data = readFormData();
+      const stub = buildStub(data);
+      const json = JSON.stringify(stub, null, 2);
+
+      const box  = document.getElementById('json-preview');
+      const code = document.getElementById('json-preview-code');
+      code.textContent = json;
+      box.classList.add('visible');
+
+      // store for copy button
+      box.dataset.json = json;
+    });
+
+    /* Copy preview JSON */
+    document.getElementById('btn-copy-preview').addEventListener('click', () => {
+      const box = document.getElementById('json-preview');
+      if (box.dataset.json) {
+        copyText(box.dataset.json, 'JSON');
+      }
+    });
+
+    /* Submit Issue — open GitHub new issue with prefilled body */
+    document.getElementById('btn-submit-issue').addEventListener('click', () => {
+      const data = readFormData();
+
+      // Basic validation
+      const missing = [];
+      if (!data.name)        missing.push('name');
+      if (!data.description) missing.push('description');
+      if (!data.author)      missing.push('author');
+
+      if (missing.length) {
+        showToast('Required: ' + missing.join(', '));
+        // focus first missing field
+        const fieldMap = { name: 'field-name', description: 'field-description', author: 'field-author' };
+        document.getElementById(fieldMap[missing[0]]).focus();
+        return;
+      }
+
+      const stub = buildStub(data);
+      const body = [
+        '## Blueprint submission',
+        '',
+        '```json',
+        JSON.stringify(stub, null, 2),
+        '```',
+        '',
+        '---',
+        '_Submitted via [submit.html](https://github.com/SolSolis-Sys/conductor-blueprints/blob/main/web/submit.html)_'
+      ].join('\n');
+
+      const title = encodeURIComponent('[Blueprint] ' + (data.name || 'new-blueprint'));
+      const bodyEnc = encodeURIComponent(body);
+      const labels = encodeURIComponent('blueprint-submission');
+      const url = `https://github.com/SolSolis-Sys/conductor-blueprints/issues/new?title=${title}&body=${bodyEnc}&labels=${labels}`;
+
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+
+    /* ================================================================
+     * SECTION 2 — JSON Tree Viewer
+     * Implementation maison, 0 dépendance.
+     * ============================================================== */
+
+    let _parsedJson = null; // stored parsed value for Copy JSON
+
+    /* ── Escape HTML ──────────────────────────────────────────────── */
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ── Render a single value inline (leaf) ─────────────────────── */
+    function renderLeaf(val) {
+      if (val === null)            return `<span class="jt-null">null</span>`;
+      if (typeof val === 'boolean') return `<span class="jt-bool">${val}</span>`;
+      if (typeof val === 'number')  return `<span class="jt-num">${esc(val)}</span>`;
+      if (typeof val === 'string')  return `<span class="jt-str">&quot;${esc(val)}&quot;</span>`;
+      return `<span>${esc(String(val))}</span>`;
+    }
+
+    /* ── Recursively build DOM nodes for a value ─────────────────── */
+    let _nodeId = 0;
+
+    function buildNode(val, key, isLast, depth = 0) {
+      if (depth > 50) {
+        const limitNode = document.createElement('div');
+        limitNode.className = 'jt-node';
+        limitNode.innerHTML = renderLeaf('[max depth exceeded]');
+        return limitNode;
+      }
+      const comma = isLast ? '' : '<span class="jt-comma">,</span>';
+      const node = document.createElement('div');
+      node.className = 'jt-node';
+      node.setAttribute('role', 'treeitem');
+
+      const keyHtml = key !== null
+        ? `<span class="jt-key">&quot;${esc(key)}&quot;</span><span class="jt-colon">:</span> `
+        : '';
+
+      if (val !== null && typeof val === 'object') {
+        const isArr   = Array.isArray(val);
+        const entries = isArr ? val : Object.keys(val);
+        const count   = entries.length;
+        const open    = isArr ? '[' : '{';
+        const close   = isArr ? ']' : '}';
+        const id      = 'jt-' + (++_nodeId);
+
+        if (count === 0) {
+          node.innerHTML = `${keyHtml}<span class="jt-bracket">${open}${close}</span>${comma}`;
+          return node;
+        }
+
+        // Toggler button
+        const toggler = document.createElement('button');
+        toggler.className = 'jt-toggler';
+        toggler.setAttribute('aria-expanded', 'true');
+        toggler.setAttribute('aria-controls', id);
+        toggler.innerHTML =
+          `<span class="jt-arrow open" aria-hidden="true">▶</span>` +
+          `${keyHtml}<span class="jt-bracket">${open}</span>` +
+          `<span class="jt-count">${count} ${count === 1 ? 'item' : 'items'}</span>`;
+
+        // Children container
+        const children = document.createElement('div');
+        children.className = 'jt-children';
+        children.setAttribute('role', 'group');
+        children.id = id;
+
+        if (isArr) {
+          val.forEach((item, idx) => {
+            children.appendChild(buildNode(item, null, idx === val.length - 1, depth + 1));
+          });
+        } else {
+          const keys = Object.keys(val);
+          keys.forEach((k, idx) => {
+            children.appendChild(buildNode(val[k], k, idx === keys.length - 1, depth + 1));
+          });
+        }
+
+        // Close bracket line
+        const closeLine = document.createElement('div');
+        closeLine.className = 'jt-node';
+        closeLine.innerHTML = `<span class="jt-bracket">${close}</span>${comma}`;
+
+        toggler.addEventListener('click', () => {
+          const expanded = toggler.getAttribute('aria-expanded') === 'true';
+          toggler.setAttribute('aria-expanded', String(!expanded));
+          toggler.querySelector('.jt-arrow').classList.toggle('open', !expanded);
+          children.classList.toggle('collapsed', expanded);
+          closeLine.style.display = expanded ? 'none' : '';
+        });
+
+        node.appendChild(toggler);
+        node.appendChild(children);
+        node.appendChild(closeLine);
+        return node;
+      }
+
+      // Leaf
+      node.innerHTML = `${keyHtml}${renderLeaf(val)}${comma}`;
+      return node;
+    }
+
+    /* ── Parse & render ──────────────────────────────────────────── */
+    function parseAndRender() {
+      const raw    = document.getElementById('json-raw').value.trim();
+      const status = document.getElementById('viewer-status');
+      const box    = document.getElementById('json-tree-box');
+      const body   = document.getElementById('json-tree-body');
+      const label  = document.getElementById('tree-toolbar-label');
+
+      body.innerHTML = '';
+      _parsedJson = null;
+
+      if (!raw) {
+        status.textContent = 'Paste JSON above, then click Parse & View.';
+        status.className = 'parse-status';
+        box.classList.remove('visible');
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (err) {
+        status.textContent = 'Parse error: ' + err.message;
+        status.className = 'parse-status err';
+        box.classList.remove('visible');
+        return;
+      }
+
+      _parsedJson = parsed;
+      _nodeId = 0;
+
+      const isArr = Array.isArray(parsed);
+      const count = isArr ? parsed.length : Object.keys(parsed).length;
+      status.textContent = 'Valid JSON — ' + count + (count === 1 ? ' key/item' : ' keys/items');
+      status.className = 'parse-status ok';
+
+      // Root wrapper
+      const root = buildNode(parsed, null, true);
+      body.appendChild(root);
+
+      const typeLabel = isArr ? 'Array' : 'Object';
+      label.textContent = typeLabel + ' · ' + count + (count === 1 ? ' entry' : ' entries');
+
+      box.classList.add('visible');
+
+      const treeBody = document.getElementById('json-tree-body');
+      if (treeBody) { treeBody.setAttribute('tabindex', '-1'); treeBody.focus(); }
+    }
+
+    document.getElementById('btn-parse').addEventListener('click', parseAndRender);
+
+    /* Allow Ctrl+Enter in the textarea to trigger parse */
+    document.getElementById('json-raw').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        parseAndRender();
+      }
+    });
+
+    /* Copy formatted JSON */
+    document.getElementById('btn-copy-formatted').addEventListener('click', () => {
+      const raw = document.getElementById('json-raw').value.trim();
+      if (!raw) { showToast('Nothing to copy'); return; }
+
+      let formatted;
+      try {
+        formatted = JSON.stringify(JSON.parse(raw), null, 2);
+      } catch (_) {
+        showToast('Invalid JSON — fix errors first');
+        return;
+      }
+      copyText(formatted, 'Formatted JSON');
+    });
+
+    /* Expand all / Collapse all */
+    function setAllNodes(expand) {
+      const body = document.getElementById('json-tree-body');
+      const togglers = body.querySelectorAll('.jt-toggler');
+      togglers.forEach(tog => {
+        const isExpanded = tog.getAttribute('aria-expanded') === 'true';
+        if ((expand && !isExpanded) || (!expand && isExpanded)) {
+          tog.click();
+        }
+      });
+    }
+
+    document.getElementById('btn-expand-all').addEventListener('click', () => setAllNodes(true));
+    document.getElementById('btn-collapse-all').addEventListener('click', () => setAllNodes(false));
+  </script>
+</body>
+</html>

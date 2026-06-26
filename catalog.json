@@ -162,6 +162,21 @@
       "cost_tier": "low"
     },
     {
+      "id": "solsolis/hook-integration-test",
+      "name": "hook-integration-test",
+      "version": "1.0.0",
+      "description": "Implements, registers, tests, and documents a new Claude Code hook through exploration, design, implementation, registration, unit testing, and documentation.",
+      "author": "SolSolis-Sys",
+      "tags": [
+        "hooks",
+        "claude-code",
+        "plugin",
+        "integration-test",
+        "implementation"
+      ],
+      "cost_tier": "low"
+    },
+    {
       "id": "solfoundy/idea-to-spec",
       "name": "idea-to-spec",
       "version": "1.0.2",
@@ -282,21 +297,6 @@
         "adversarial"
       ],
       "cost_tier": "medium"
-    },
-    {
-      "id": "solsolis/hook-integration-test",
-      "name": "hook-integration-test",
-      "version": "1.0.0",
-      "description": "Implements, registers, tests, and documents a new Claude Code hook through exploration, design, implementation, and validation.",
-      "author": "SolSolis-Sys",
-      "tags": [
-        "hooks",
-        "claude-code",
-        "plugin",
-        "integration-test",
-        "implementation"
-      ],
-      "cost_tier": "low"
     }
   ]
 }

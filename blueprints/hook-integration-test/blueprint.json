@@ -1,0 +1,91 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solsolis/hook-integration-test",
+  "name": "hook-integration-test",
+  "version": "1.0.0",
+  "title": "Hook Integration Test — Implement & Test New Claude Code Hook",
+  "description": "Generic workflow to implement, register, test, and document a new Claude Code hook in any plugin. Covers exploration, design, implementation, registration, unit testing, and documentation.",
+  "author": "SolSolis-Sys",
+  "license": "MIT",
+  "tags": ["hooks", "claude-code", "plugin", "integration-test", "implementation"],
+  "inputs": [
+    {
+      "name": "plugin_name",
+      "type": "string",
+      "description": "Plugin name in kebab-case (e.g., 'conductor-memory', 'token-watch')",
+      "required": true
+    },
+    {
+      "name": "plugin_path",
+      "type": "string",
+      "description": "Absolute path to plugin root directory (e.g., 'D:/HYPERION/conductor-memory')",
+      "required": true
+    },
+    {
+      "name": "hook_event",
+      "type": "string",
+      "description": "Hook event type (e.g., 'session.open', 'file.save', 'command.execute')",
+      "required": true
+    },
+    {
+      "name": "output_type",
+      "type": "string",
+      "description": "Hook output type: 'systemMessage' (display to user) or 'silent' (write data only)",
+      "required": true
+    },
+    {
+      "name": "data_path",
+      "type": "string",
+      "description": "Optional path to write data if output_type is 'silent' (e.g., '~/.claude/hooks/plugin-name/data.json')",
+      "required": false,
+      "default": ""
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "description": "Brief hook description for documentation (e.g., 'Track session open events')",
+      "required": false,
+      "default": ""
+    }
+  ],
+  "cost_profile": {
+    "tier": "low",
+    "avg_tokens_per_run": 18000,
+    "estimated_cost_usd": 0.06
+  },
+  "permissions": {
+    "network": false,
+    "filesystem": "read-write",
+    "allowed_commands": ["mkdir", "touch", "cat", "grep", "find", "node", "npm", "npx"]
+  },
+  "agents": [
+    {
+      "role": "hook-explorer",
+      "prompt": "Explore the plugin structure and understand existing hooks.\n\nPlugin: {{plugin_name}}\nPath: {{plugin_path}}\n\nYour task:\n1. Read plugin.json from {{plugin_path}} — understand plugin metadata, version, entry points\n2. Check if hooks.json exists at {{plugin_path}}/hooks.json — if yes, read and catalog existing hooks\n3. Search for hook implementations in src/ or lib/ directories (look for hook handler patterns)\n4. Identify the hook registration mechanism (does the plugin use hooks.json, or register hooks programmatically?)\n5. List any dependencies for hook handling (e.g., @anthropic-ai/claude-code-sdk, fs modules)\n6. Check tests/ directory for existing hook test patterns\n\nReturn JSON:\n{\n  \"plugin_metadata\": {\"name\": \"\", \"version\": \"\", \"description\": \"\"},\n  \"existing_hooks\": [{\"name\": \"\", \"event\": \"\", \"output_type\": \"\", \"file\": \"\"}],\n  \"has_hooks_json\": true|false,\n  \"hook_registration_method\": \"hooks.json|programmatic|unknown\",\n  \"hook_implementations_found\": [{\"file\": \"\", \"hook_name\": \"\"}],\n  \"hook_dependencies\": [],\n  \"test_patterns_found\": [{\"file\": \"\", \"pattern\": \"\"}],\n  \"issues\": []\n}"
+    },
+    {
+      "role": "hook-designer",
+      "prompt": "Design the hook specification based on requirements and existing patterns.\n\nPlugin: {{plugin_name}}\nEvent type: {{hook_event}}\nOutput type: {{output_type}}\nData path: {{data_path}}\nDescription: {{description}}\n\nExisting patterns: {{hook-explorer.existing_hooks}}\nRegistration method: {{hook-explorer.hook_registration_method}}\n\nYour task:\n1. Define hook name (kebab-case, e.g., 'on-session-open') based on {{hook_event}}\n2. Specify event trigger (which Claude Code event fires this hook)\n3. Define output format:\n   - If systemMessage: structure the message content (JSON or markdown)\n   - If silent: define data schema for {{data_path}}\n4. Identify required input data from Claude Code runtime (session ID, file path, etc.)\n5. Specify error handling behavior (fail silently or throw?)\n6. Define throttle/debounce rules (if applicable)\n7. Map hook to existing registration method (use patterns from hook-explorer)\n8. Identify potential security considerations (input validation, file access)\n\nReturn JSON:\n{\n  \"hook_name\": \"\",\n  \"event_trigger\": \"\",\n  \"output_format\": {\n    \"type\": \"systemMessage|silent\",\n    \"schema\": {}\n  },\n  \"required_inputs\": [],\n  \"error_handling\": \"silent|throw|log\",\n  \"throttle_ms\": 0,\n  \"registration_format\": {},\n  \"security_notes\": []\n}"
+    },
+    {
+      "role": "hook-implementer",
+      "prompt": "Write the hook implementation script.\n\nPlugin: {{plugin_name}}\nHook name: {{hook-designer.hook_name}}\nEvent: {{hook_event}}\nOutput type: {{output_type}}\nHook design: {{hook-designer}}\n\nYour task:\n1. Write a Node.js/TypeScript hook handler script\n2. Include proper error handling (try-catch, exit 0 for success)\n3. Handle required inputs from Claude Code runtime\n4. If output_type is systemMessage: format the message clearly\n5. If output_type is silent: write data to {{data_path}} safely (create directories if needed)\n6. Use stdlib only (no external dependencies beyond what plugin already has)\n7. Include inline comments explaining the hook logic\n8. Ensure script exits with code 0 on success, non-zero on hard errors\n9. Add input validation (check for undefined required fields)\n\nReturn:\n{\n  \"file_path\": \"src/hooks/[hook-name].js\",\n  \"script_content\": \"<full Node.js/TypeScript code>\",\n  \"dependencies_needed\": [],\n  \"notes\": []\n}"
+    },
+    {
+      "role": "hook-registrar",
+      "prompt": "Register the hook in the plugin configuration.\n\nPlugin: {{plugin_name}}\nPlugin path: {{plugin_path}}\nHook name: {{hook-designer.hook_name}}\nHook file: {{hook-implementer.file_path}}\nRegistration method: {{hook-explorer.hook_registration_method}}\n\nYour task:\n1. Determine correct registration format based on {{hook-explorer.hook_registration_method}}\n2. If hooks.json exists: add entry to hooks array with event, name, handler path, output_type\n3. If programmatic: identify where to add hook registration in plugin code\n4. Ensure hook path is correct relative to plugin root\n5. Validate the registration entry against Claude Code hook schema\n6. Check for naming conflicts with existing hooks\n7. Verify output_type matches {{output_type}}\n\nReturn JSON:\n{\n  \"registration_entry\": {},\n  \"target_file\": \"\",\n  \"changes_needed\": [\n    {\"file\": \"\", \"action\": \"add|update|create\", \"content\": \"\"}\n  ],\n  \"validation_status\": \"valid|invalid\",\n  \"issues\": []\n}"
+    },
+    {
+      "role": "hook-tester",
+      "prompt": "Design unit tests and manual verification steps.\n\nHook name: {{hook-designer.hook_name}}\nHook file: {{hook-implementer.file_path}}\nOutput type: {{output_type}}\nOutput format: {{hook-designer.output_format}}\n\nYour task:\n1. Design unit tests (Jest/Vitest pattern) covering:\n   - Hook loads without errors\n   - Handles missing inputs gracefully\n   - Produces correct output format\n   - Error cases are handled\n2. For systemMessage hooks: test message structure\n3. For silent hooks: test data file creation and schema validity\n4. Create manual verification steps for testing via settings.json\n5. Include test file path and test code\n6. Specify how to run tests (npm test command)\n7. Define done-when criteria for testing\n\nReturn JSON:\n{\n  \"test_file_path\": \"tests/hooks/[hook-name].test.ts\",\n  \"test_code\": \"<Jest/Vitest test suite>\",\n  \"manual_verification_steps\": [\n    {\"step\": 1, \"description\": \"\", \"expected_result\": \"\"}\n  ],\n  \"run_command\": \"npm test -- [hook-name]\",\n  \"done_when_criteria\": [\n    \"All unit tests pass\",\n    \"Manual verification succeeds\"\n  ]\n}"
+    },
+    {
+      "role": "hook-documenter",
+      "prompt": "Create or update documentation.\n\nPlugin: {{plugin_name}}\nHook name: {{hook-designer.hook_name}}\nHook description: {{description}}\nEvent: {{hook_event}}\nOutput type: {{output_type}}\n\nYour task:\n1. Check if plugin has a README.md at {{plugin_path}}\n2. If README exists: propose additions to a 'Hooks' section\n3. Create hook documentation including:\n   - Hook name and event trigger\n   - Description (from {{description}})\n   - Output format (schema or message structure)\n   - Example configuration in settings.json\n   - Error handling behavior\n   - Usage example\n4. If README doesn't exist: create a template README with hooks section\n5. Ensure documentation is clear for end users\n\nReturn JSON:\n{\n  \"readme_exists\": true|false,\n  \"hook_docs_section\": \"<markdown text>\",\n  \"example_settings_json\": {},\n  \"files_to_create_or_update\": [\n    {\"file\": \"\", \"action\": \"create|update\", \"content\": \"\"}\n  ]\n}"
+    }
+  ],
+  "loop": {
+    "exit_condition": "hook-documenter outputs documentation without errors",
+    "max_rounds": 1
+  }
+}

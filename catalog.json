@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.2.0",
   "artefacts": {
     "agents": [
       "adversarial-reviewer",
@@ -252,6 +252,21 @@
         "feature",
         "production",
         "tickets"
+      ],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solfoundy/spec-to-plan",
+      "name": "spec-to-plan",
+      "version": "0.1.0",
+      "description": "Transforms a structured technical specification into a phased implementation plan with atomic tasks, DONE-WHEN criteria, and dependency ordering.",
+      "author": "SolFoundy",
+      "tags": [
+        "planning",
+        "spec",
+        "plan",
+        "implementation",
+        "hybrid"
       ],
       "cost_tier": "medium"
     },

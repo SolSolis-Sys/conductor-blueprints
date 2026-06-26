@@ -1,0 +1,75 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.json",
+  "id": "solfoundy/spec-to-plan",
+  "name": "spec-to-plan",
+  "version": "0.1.0",
+  "title": "Spec → Implementation Plan",
+  "description": "Transforms a structured technical specification into a phased implementation plan with atomic tasks, DONE-WHEN criteria, and dependency ordering.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["planning", "spec", "plan", "implementation", "hybrid"],
+
+  "inputs": [
+    {
+      "name": "spec_path",
+      "type": "string",
+      "required": true,
+      "description": "Absolute path to the spec markdown file"
+    },
+    {
+      "name": "project",
+      "type": "string",
+      "required": true,
+      "description": "Project name (e.g., 'conductor-memory')"
+    },
+    {
+      "name": "output_path",
+      "type": "string",
+      "required": true,
+      "description": "Absolute path where the plan .md will be written"
+    },
+    {
+      "name": "focus_version",
+      "type": "string",
+      "required": false,
+      "default": "v0.2.0",
+      "description": "First version to plan in detail (others summarized)"
+    }
+  ],
+
+  "cost_profile": {
+    "tier": "medium",
+    "avg_tokens_per_run": 35000,
+    "estimated_cost_usd": 0.10
+  },
+
+  "permissions": {
+    "network": false,
+    "filesystem": "read-write",
+    "allowed_commands": ["mkdir"]
+  },
+
+  "agents": [
+    {
+      "role": "spec-reader",
+      "prompt": "Read the specification file at {{spec_path}} and extract structured data. Return JSON with this exact structure:\n{\n  \"versions\": [{ \"name\": \"v0.X.Y\", \"features\": [\"...\"] }],\n  \"adrs\": [{ \"id\": \"ADR-NN\", \"decision\": \"...\", \"status\": \"accepted|proposed\" }],\n  \"api_functions\": [\"func_name(arg) → return_type\"],\n  \"context_levels\": [{ \"name\": \"level_name\", \"description\": \"...\" }],\n  \"known_gaps\": [\"gap description\"]\n}\nBe precise: extract literal text from the spec, do NOT paraphrase."
+    },
+    {
+      "role": "phase-analyzer",
+      "prompt": "Analyze the specification structure:\nVersions: {{spec-reader.versions}}\nADRs: {{spec-reader.adrs}}\nGaps: {{spec-reader.known_gaps}}\n\nFor {{focus_version}} and all subsequent versions, identify:\n1. Dependencies: which versions/ADRs must complete first?\n2. Prerequisites: technical foundations required?\n3. Complexity per phase (low/medium/high)\n4. Critical path (longest chain of dependent tasks)\n5. Estimated sessions per phase (1 session = 4h)\n\nReturn JSON:\n{\n  \"phases\": [\n    {\n      \"version\": \"v0.X.Y\",\n      \"name\": \"phase name\",\n      \"description\": \"...\",\n      \"prerequisites\": [\"v0.X.Y\", \"ADR-NN\"],\n      \"complexity\": \"low|medium|high\",\n      \"estimated_sessions\": N,\n      \"critical_path\": [\"task1\", \"task2\"]\n    }\n  ]\n}"
+    },
+    {
+      "role": "task-decomposer",
+      "prompt": "Decompose {{focus_version}} (from phases: {{phase-analyzer.phases}}) into atomic, 2-4 hour tickets.\n\nGenerate 8-15 tickets with:\n- id: TICK-NN (sequential)\n- title: one-liner\n- description: 2-3 sentences\n- DONE-WHEN: 3-5 measurable acceptance criteria\n- depends_on: [TICK-XX] (if any)\n- files_affected: [path/to/file]\n- agent: matos | janus | theia (who should do it?)\n- estimated_tokens: rough estimate\n\nRespect dependencies (foundations before features).\n\nReturn JSON array:\n[\n  {\n    \"id\": \"TICK-01\",\n    \"title\": \"...\",\n    \"description\": \"...\",\n    \"done_when\": [\"criterion 1\", \"criterion 2\"],\n    \"depends_on\": [],\n    \"files_affected\": [],\n    \"agent\": \"theia\",\n    \"estimated_tokens\": 8000\n  }\n]"
+    },
+    {
+      "role": "plan-writer",
+      "prompt": "Synthesize all outputs into a complete implementation plan:\n\nPhases from analyzer: {{phase-analyzer.phases}}\nTickets for {{focus_version}}: {{task-decomposer}}\n\nConstruct a markdown plan at {{output_path}} with this structure:\n\n# PLAN-{{project}}-{{focus_version}}.md\n\n## Overview\nBrief summary of the plan scope.\n\n## Phases\n| Version | Phase | Complexity | Sessions | Prerequisites |\n|---------|-------|-----------|----------|---------------|\n(table of all phases)\n\n## Phase {{focus_version}} — Detailed Implementation\n\n### Tickets\n| ID | Title | Agent | Tokens | Depends |\n|----|----|-------|--------|----------|\n(table of tickets)\n\n### Ticket Details\nFor each ticket: ID, Description, DONE-WHEN criteria, Files affected.\n\n## Subsequent Phases (Summary)\n(brief list of remaining versions)\n\n## ADR Impact\n(reference impacted ADRs from {{spec-reader.adrs}})\n\n## Conventions\n- Agent assignment: matos (Python/backend), janus (frontend), theia (specs/planning)\n- DONE-WHEN format: measurable, verifiable at code review\n- Dependencies: respect critical path from {{phase-analyzer.phases}}\n\nUse the Claude Code Write tool to save the file. Return: {\"path\": \"{{output_path}}\", \"line_count\": N, \"status\": \"written\"}"
+    }
+  ],
+
+  "loop": {
+    "exit_condition": "plan-writer returned status='written' with line_count > 50",
+    "max_rounds": 1
+  }
+}

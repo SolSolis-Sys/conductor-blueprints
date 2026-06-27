@@ -35,7 +35,11 @@ function validateJSON(filePath, content) {
 }
 
 function validateBlueprint(filePath, blueprint) {
-  // Required fields per schema
+  // Required fields per schema — coerce gates[] (v1.1) → agents[] (v1.0)
+  if (!blueprint.agents && Array.isArray(blueprint.gates)) {
+    blueprint.agents = blueprint.gates;
+  }
+
   const required = ['name', 'version', 'agents'];
 
   for (const field of required) {
@@ -57,7 +61,7 @@ function validateBlueprint(filePath, blueprint) {
     return false;
   }
 
-  // Validate agents
+  // Validate agents (or gates coerced above)
   if (!Array.isArray(blueprint.agents) || blueprint.agents.length === 0) {
     logError(`Blueprint ${filePath} agents must be a non-empty array`);
     return false;
@@ -65,6 +69,8 @@ function validateBlueprint(filePath, blueprint) {
 
   for (let i = 0; i < blueprint.agents.length; i++) {
     const agent = blueprint.agents[i];
+    // Tool gates (type:"tool") use id+command, not role — skip role check
+    if (agent.type === 'tool') continue;
     if (!agent.role || typeof agent.role !== 'string') {
       logError(`Blueprint ${filePath} agent[${i}] missing or invalid 'role' field`);
       return false;

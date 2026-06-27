@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json",
+  "schema_version": "1.1.0",
+  "id": "solfoundy/data-migration-validator",
+  "name": "data-migration-validator",
+  "version": "0.1.0",
+  "title": "Data Migration Validator",
+  "description": "Pre-execution validation for data migration scripts: idempotence check, data completeness, rollback viability, and edge case handling.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["migration","data","validation","quality","database"],
+  "inputs": [
+    {"name":"migration_script","type":"string","description":"Path to migration script or description of migration logic","required":true},
+    {"name":"source_data_desc","type":"string","description":"Description of source data format","required":true},
+    {"name":"destination_data_desc","type":"string","description":"Description of destination data format","required":true},
+    {"name":"record_count_source","type":"number","description":"Expected source record count (0 if unknown)","required":false,"default":0},
+    {"name":"edge_cases","type":"string","description":"Known edge cases to test","required":false,"default":"empty fields, null values, encoding"}
+  ],
+  "cost_profile": {"tier":"medium","avg_tokens_per_run":45000,"estimated_cost_usd":0.13},
+  "permissions": {"network":false,"filesystem":"read-only","allowed_commands":[]},
+  "gates": [
+    {"id":"idempotence-reviewer","type":"agent","role":"idempotence-reviewer","prompt":"Analyze this migration script for idempotence.\n\nMigration script: {{migration_script}}\nSource: {{source_data_desc}}\nDestination: {{destination_data_desc}}\n\nIdentify non-idempotent operations, check transaction boundaries, list global state modifications.\nRate: SAFE / AT_RISK / UNSAFE.\n\nReturn JSON: { \"is_idempotent\":\"SAFE|AT_RISK|UNSAFE\", \"non_idempotent_ops\":[{\"operation\":\"\",\"risk\":\"\",\"fix\":\"\"}], \"transaction_handling\":\"adequate|missing|unclear\", \"global_state_changes\":[], \"severity\":\"critical|high|medium|low\", \"recommendation\":\"safe-to-run|needs-revision|do-not-run\" }","output_format":"json"},
+    {"id":"completeness-reviewer","type":"agent","role":"completeness-reviewer","prompt":"Analyze data completeness: are all source records migrated to destination?\n\nMigration script: {{migration_script}}\nSource: {{source_data_desc}}\nDestination: {{destination_data_desc}}\nExpected source count: {{record_count_source}}\nEdge cases: {{edge_cases}}\n\nCheck record counting, filtering logic, edge case coverage. Rate: FULL / PARTIAL / GAPS.\n\nReturn JSON: { \"completeness_rating\":\"FULL|PARTIAL|GAPS\", \"filtering_logic\":{\"applied\":true,\"reason\":\"\"}, \"edge_case_coverage\":[{\"case\":\"\",\"handled\":true,\"mechanism\":\"\"}], \"test_data_suggestion\":\"\", \"missing_records_risk\":\"none|low|medium|high\" }","output_format":"json"},
+    {"id":"rollback-reviewer","type":"agent","role":"rollback-reviewer","prompt":"Assess rollback capability for this migration.\n\nMigration script: {{migration_script}}\nSource: {{source_data_desc}}\nDestination: {{destination_data_desc}}\n\nIdentify source data status after migration, backup strategy, reversibility of transformations, data loss risk. Rate: FULL_ROLLBACK / PARTIAL_ROLLBACK / NO_ROLLBACK.\n\nReturn JSON: { \"rollback_viability\":\"FULL_ROLLBACK|PARTIAL_ROLLBACK|NO_ROLLBACK\", \"source_data_status\":\"deleted|archived|in-place\", \"backup_strategy\":\"exists|missing|unclear\", \"irreversible_transforms\":[], \"data_loss_risk\":\"none|low|medium|high\", \"rollback_procedure\":\"\" }","output_format":"json"},
+    {"id":"synthesizer","type":"agent","role":"synthesizer","prompt":"Synthesize validation findings into a migration safety report.\n\nIdempotence: {{idempotence-reviewer}}\nCompleteness: {{completeness-reviewer}}\nRollback: {{rollback-reviewer}}\n\nConsolidate into executive summary, list critical blockers, required fixes. Assign safety score 1-10. Decision: APPROVE (>=7) / REVISE (4-6) / REJECT (<4).\n\nReturn plain text:\n## Migration Validation Report\n**Safety Score:** [N]/10\n**Decision:** APPROVE | REVISE | REJECT\n### Summary\n### Critical Blockers\n### Required Revisions\n### Next Steps","output_format":"text"}
+  ],
+  "loop": {"exit_condition":"synthesizer produced report with APPROVE/REVISE/REJECT decision","max_rounds":1}
+}

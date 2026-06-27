@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json",
+  "schema_version": "1.1.0",
+  "id": "solsolis/article-writing",
+  "name": "article-writing",
+  "version": "0.1.0",
+  "title": "Article Writing Pipeline",
+  "description": "End-to-end article writing workflow: research, draft, structural edit (Pocock method), anti-slop pass, and publish.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["writing","article","prose","editing","translation","content"],
+  "inputs": [
+    {"name":"source_path","type":"string","required":true,"description":"Path to source draft, notes, or reference documents"},
+    {"name":"target_path","type":"string","required":true,"description":"Target output file path (markdown)"},
+    {"name":"lang","type":"string","required":true,"description":"Language: 'fr', 'en', or 'both' (bilingual)"}
+  ],
+  "cost_profile": {"tier":"medium","avg_tokens_per_run":45000,"estimated_cost_usd":0.08},
+  "permissions": {"network":false,"filesystem":"read-write","allowed_commands":[]},
+  "gates": [
+    {"id":"researcher","type":"agent","role":"writer","prompt":"Read and synthesize all source material for the article.\n\nSource: {{source_path}}\nLanguage: {{lang}}\n\nYour task:\n1. Read the source draft, notes, and references from {{source_path}}\n2. Identify key themes, arguments, and structure\n3. Note gaps or missing information\n4. Summarize findings: main thesis, supporting points, tone, audience\n\nReturn a structured research summary.","output_format":"text"},
+    {"id":"drafter","type":"agent","role":"writer","prompt":"Write the initial article draft.\n\nResearch: {{researcher}}\nSource: {{source_path}}\nLanguage: {{lang}}\n\nWrite a complete draft in {{lang}}. Aim for clarity and density — no padding.\n\nReturn the full draft text.","output_format":"text"},
+    {"id":"structural-editor","type":"agent","role":"writer","prompt":"Apply structural editing using the Matt Pocock method.\n\nDraft: {{drafter}}\nLanguage: {{lang}}\n\nYour task:\n1. Analyze the draft as a DAG — identify which sections depend on which\n2. Reorder sections so each builds on what came before\n3. Enforce paragraphs ≤240 characters — split longer ones\n4. Verify logical flow: no section assumes unintroduced concepts\n5. Remove redundant transitions and throat-clearing\n\nReturn the structurally edited article.","output_format":"text"},
+    {"id":"anti-slop","type":"agent","role":"writer","prompt":"Polish and anti-slop the article.\n\nArticle: {{structural-editor}}\nLanguage: {{lang}}\n\nRemove clichés, replace passive with active voice, cut filler words (just, really, basically, very, quite), tighten every sentence.\n\nReturn the polished article.","output_format":"text"},
+    {"id":"publisher","type":"agent","role":"writer","prompt":"Write the final article to disk.\n\nFinal article: {{anti-slop}}\nTarget: {{target_path}}\n\nWrite the final polished article to {{target_path}} in proper markdown. Confirm the file was written.\n\nReturn: 'Published to {{target_path}}'","output_format":"text"}
+  ],
+  "loop": {"exit_condition":"publisher confirmed file written","max_rounds":1}
+}

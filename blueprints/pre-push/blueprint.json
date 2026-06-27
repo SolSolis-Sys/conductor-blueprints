@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json",
+  "schema_version": "1.1.0",
+  "id": "solsolis/pre-push",
+  "name": "pre-push",
+  "version": "0.1.0",
+  "title": "Pre-Push Security Gate",
+  "description": "Deterministic data leak detection for OSS repos. Scans files against configurable wordlist (YAML) to catch internal IDs, credentials, and personal data before pushing.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["security","pre-push","leak-detection","oss","quality"],
+  "inputs": [
+    {"name":"target_path","type":"string","required":true,"description":"File path or directory to scan"},
+    {"name":"wordlist_path","type":"string","required":false,"default":"~/.claude/conductor/pre-push-wordlist.yaml","description":"Path to wordlist configuration file (YAML format)"},
+    {"name":"fail_on_match","type":"boolean","required":false,"default":true,"description":"Exit with failure status if any error-severity matches found"}
+  ],
+  "cost_profile": {"tier":"low","avg_tokens_per_run":2000,"estimated_cost_usd":0.01},
+  "permissions": {"network":false,"filesystem":"read-only","allowed_commands":["grep","cat","find","ls"]},
+  "gates": [
+    {"id":"load-wordlist","type":"tool","command":"cat {{wordlist_path}} 2>/dev/null || echo 'WORDLIST_NOT_FOUND'","timeout_ms":5000,"on_failure":"continue","output_var":"wordlist_content"},
+    {"id":"scan-files","type":"tool","command":"grep -rn --include='*.py' --include='*.js' --include='*.ts' --include='*.json' --include='*.yaml' --include='*.md' {{target_path}} --exclude-dir=venv --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__ --exclude-dir=dist 2>/dev/null || echo 'NO_MATCHES'","timeout_ms":30000,"on_failure":"continue","output_var":"scan_results"},
+    {"id":"evaluator","type":"agent","role":"evaluator","prompt":"Evaluate pre-push security scan results.\n\nWordlist config:\n{{wordlist_content}}\n\nScan results:\n{{scan_results}}\n\nYour task:\n1. Parse wordlist categories and their severity (error|warning)\n2. Match scan results against each pattern\n3. Count matches by severity\n4. Decision: if any 'error' severity match → FAIL, else → PASS\n\nReturn JSON: { \"status\":\"PASS|FAIL\", \"error_count\":0, \"warning_count\":0, \"categories_hit\":[], \"matches\":[{\"file\":\"\",\"line\":0,\"pattern\":\"\",\"severity\":\"\"}] }","output_format":"json","condition":"{{scan_results}} != 'NO_MATCHES'"},
+    {"id":"reporter","type":"agent","role":"reporter","prompt":"Generate a pre-push security report.\n\nEvaluation: {{evaluator}}\n\nIf status is FAIL: produce a concise markdown report with summary (counts by severity), findings grouped by category, and remediation steps.\nIf status is PASS: output a single line: 'PASS: No sensitive data detected.'","output_format":"text"}
+  ],
+  "loop": {"exit_condition":"reporter produced output","max_rounds":1}
+}

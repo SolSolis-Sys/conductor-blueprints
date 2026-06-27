@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json",
+  "schema_version": "1.1.0",
+  "id": "solsolis/spec-to-roadmap",
+  "name": "spec-to-roadmap",
+  "version": "0.1.0",
+  "title": "Spec to Roadmap Generator",
+  "description": "Transform a project spec or ticket plan into a versioned roadmap with milestones, defining exactly what ships in each release.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["roadmap","planning","versioning","milestones","release","spec"],
+  "inputs": [
+    {"name":"source_path","type":"string","description":"Path to the source spec or ticket plan document","required":true},
+    {"name":"target_path","type":"string","description":"Path where ROADMAP.md will be written","required":true},
+    {"name":"current_version","type":"string","description":"Current version of the project (e.g., '0.1.0')","required":true},
+    {"name":"project_name","type":"string","description":"Name of the project","required":true}
+  ],
+  "cost_profile": {"tier":"medium","avg_tokens_per_run":60000,"estimated_cost_usd":0.10},
+  "permissions": {"network":false,"filesystem":"read-write","allowed_commands":[]},
+  "gates": [
+    {"id":"analyser","type":"agent","role":"spec-analyser","prompt":"Read and extract structured information from a project spec.\n\nSource: {{source_path}}\n\nYour task:\n1. Read the source document\n2. Extract the complete list of features/tickets\n3. Identify technical dependencies between items\n4. Determine the overall project scope\n5. Note existing constraints or priorities\n\nReturn JSON: { \"features\":[{\"id\":\"\",\"name\":\"\",\"description\":\"\"}], \"dependencies\":[[\"id1\",\"id2\"]], \"scope\":\"\", \"constraints\":[] }","output_format":"json"},
+    {"id":"milestone-designer","type":"agent","role":"milestone-designer","prompt":"Group features into coherent versioned milestones.\n\nAnalysis: {{analyser}}\nCurrent version: {{current_version}}\nProject: {{project_name}}\n\nYour task:\n1. Group features into milestones based on technical dependencies, delivered value, balanced size\n2. For each milestone: define MINOR version bump (e.g., 0.2.0, 0.3.0)\n3. Propose estimated target dates\n4. Convention: MINOR = user milestone, PATCH = fix/adjustment\n\nReturn JSON: { \"milestones\":[{\"version\":\"0.x.y\",\"target_date\":\"YYYY-MM-DD\",\"objective\":\"\",\"features\":[]}], \"rationale\":\"\" }","output_format":"json"},
+    {"id":"roadmap-writer","type":"agent","role":"roadmap-writer","prompt":"Write a structured ROADMAP.md file.\n\nMilestones: {{milestone-designer}}\nCurrent version: {{current_version}}\nProject: {{project_name}}\nTarget path: {{target_path}}\n\nWrite ROADMAP.md with: project overview, release principles, versioning conventions, per version objective+features+target date+release criteria. No internal references. Write the file to {{target_path}}.\n\nReturn JSON: { \"status\":\"created\", \"file_path\":\"{{target_path}}\", \"version_count\":0 }","output_format":"json"},
+    {"id":"reviewer","type":"agent","role":"reviewer","prompt":"Final review of the generated roadmap.\n\nProject: {{project_name}}\nRoadmap path: {{target_path}}\nMilestones: {{milestone-designer}}\nWrite result: {{roadmap-writer}}\n\nCheck: global coherence, no orphaned features, realistic target dates, no internal references, format follows expected structure.\n\nReturn JSON: { \"status\":\"ok|needs_revision\", \"issues\":[], \"confidence\":\"high|medium|low\" }","output_format":"json"}
+  ],
+  "loop": {"exit_condition":"roadmap-writer.status == 'created'","max_rounds":1}
+}

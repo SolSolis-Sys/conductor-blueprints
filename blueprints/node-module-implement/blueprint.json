@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/schemas/blueprint.v1.1.json",
+  "schema_version": "1.1.0",
+  "id": "solfoundy/node-module-implement",
+  "name": "node-module-implement",
+  "version": "0.1.0",
+  "title": "Node.js Module Implementation",
+  "description": "Implements a Node.js module from a structured ticket spec using a goldenflux hybrid approach: repo analysis → code generation → test verification → quality review.",
+  "author": "SolFoundy",
+  "license": "MIT",
+  "tags": ["node","implement","module","goldenflux","tdd","code-generation"],
+  "inputs": [
+    {"name":"ticket_spec","type":"string","required":true,"description":"Full ticket content (title + description + DONE-WHEN criteria)"},
+    {"name":"target_dir","type":"string","required":true,"description":"Absolute path to the repository"},
+    {"name":"module_name","type":"string","required":true,"description":"Name of the module to implement (e.g., 'scoring')"},
+    {"name":"test_command","type":"string","required":true,"description":"Command to run tests (e.g., 'npm test')"}
+  ],
+  "cost_profile": {"tier":"medium","avg_tokens_per_run":30000,"estimated_cost_usd":0.09},
+  "permissions": {"network":false,"filesystem":"read-write","allowed_commands":["find","ls","cat","grep","node","npm","mkdir"]},
+  "gates": [
+    {"id":"repo-reader","type":"tool","command":"cd {{target_dir}} && (cat package.json 2>/dev/null || echo '{}') && echo '---' && (ls -la lib/ 2>/dev/null || echo 'no lib dir') && echo '---' && (find test -name '*.test.js' -o -name '*.spec.js' 2>/dev/null | head -20 || echo 'no tests')","timeout_ms":10000,"on_failure":"continue","output_var":"repo_context"},
+    {"id":"module-implementer","type":"agent","role":"module-implementer","prompt":"Implement a Node.js module from a structured ticket specification.\n\nTICKET:\n{{ticket_spec}}\n\nREPO: {{target_dir}}\nMODULE: {{module_name}}\nREPO CONTEXT:\n{{repo_context}}\n\nYour task:\n1. Analyze ticket: extract title, description, DONE-WHEN criteria\n2. Review repo context: understand structure, conventions, patterns\n3. Design and implement the module at lib/{{module_name}}.js\n4. Create test file at test/{{module_name}}.test.js covering DONE-WHEN criteria\n5. Write files using available tools\n\nReturn JSON: { \"module_path\": \"lib/{{module_name}}.js\", \"test_path\": \"test/{{module_name}}.test.js\", \"files_created\": [], \"functions_exported\": [], \"implementation_notes\": \"\", \"done_when_coverage\": [] }","output_format":"json"},
+    {"id":"test-runner","type":"tool","command":"cd {{target_dir}} && {{test_command}} 2>&1","timeout_ms":15000,"on_failure":"continue","output_var":"test_output"},
+    {"id":"quality-reviewer","type":"agent","role":"quality-reviewer","prompt":"Verify the module implementation meets all requirements.\n\nTICKET DONE-WHEN:\n{{ticket_spec}}\n\nIMPLEMENTATION:\nFiles: {{module-implementer.files_created}}\nFunctions: {{module-implementer.functions_exported}}\nNotes: {{module-implementer.implementation_notes}}\n\nTEST RESULTS:\n{{test_output}}\n\nReturn JSON: { \"done_when_met\": [{\"criterion\":\"\",\"status\":\"met|not_met|partial\",\"evidence\":\"\"}], \"test_status\":\"pass|fail\", \"test_failures\":[], \"code_quality_issues\":[], \"recommended_fixes\":[], \"verdict\":\"pass|fail\", \"summary\":\"\" }","output_format":"json"}
+  ],
+  "loop": {"exit_condition":"quality-reviewer.verdict == 'pass'","max_rounds":2,"trigger":"quality-reviewer.verdict == 'fail'","on_success":"Implementation complete: all DONE-WHEN criteria met, tests passing.","on_failure":"Implementation incomplete. Fixes needed: {{quality-reviewer.recommended_fixes}}"}
+}

@@ -297,6 +297,51 @@
         "adversarial"
       ],
       "cost_tier": "medium"
+    },
+    {
+      "id": "solfoundy/node-module-implement",
+      "name": "node-module-implement",
+      "version": "0.1.0",
+      "description": "Implements a Node.js module from a structured ticket spec using a goldenflux hybrid approach: repo analysis → code generation → test verification → quality review.",
+      "author": "SolFoundy",
+      "tags": ["node", "implement", "module", "goldenflux", "tdd", "code-generation"],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solsolis/pre-push",
+      "name": "pre-push",
+      "version": "0.1.0",
+      "description": "Deterministic data leak detection for OSS repos. Scans files against configurable wordlist (YAML) to catch internal IDs, credentials, and personal data before pushing.",
+      "author": "SolFoundy",
+      "tags": ["security", "pre-push", "leak-detection", "oss", "quality"],
+      "cost_tier": "low"
+    },
+    {
+      "id": "solsolis/spec-to-roadmap",
+      "name": "spec-to-roadmap",
+      "version": "0.1.0",
+      "description": "Transform a project spec or ticket plan into a versioned roadmap with milestones, defining exactly what ships in each release.",
+      "author": "SolFoundy",
+      "tags": ["roadmap", "planning", "versioning", "milestones", "release", "spec"],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solsolis/article-writing",
+      "name": "article-writing",
+      "version": "0.1.0",
+      "description": "End-to-end article writing workflow: research, draft, structural edit (Pocock method), anti-slop pass, and publish.",
+      "author": "SolFoundy",
+      "tags": ["writing", "article", "prose", "editing", "translation", "content"],
+      "cost_tier": "medium"
+    },
+    {
+      "id": "solfoundy/data-migration-validator",
+      "name": "data-migration-validator",
+      "version": "0.1.0",
+      "description": "Pre-execution validation for data migration scripts: idempotence check, data completeness, rollback viability, and edge case handling.",
+      "author": "SolFoundy",
+      "tags": ["migration", "data", "validation", "quality", "database"],
+      "cost_tier": "medium"
     }
   ]
 }

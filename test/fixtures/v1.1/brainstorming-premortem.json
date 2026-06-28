@@ -37,7 +37,7 @@
     },
     {
       "id": "g6-synthesizer",
-      "type": "agent",
+      "type": "gate",
       "role": "synthesizer",
       "prompt": "Synthesize brainstorming and pre-mortem for: {{topic}}\n\nIdeas collected:\n- Nominal: {{ideator-nominal.ideas}}\n- Alternative: {{ideator-alternative.ideas}}\n- Constrained: {{ideator-constrained.ideas}}\n- Future: {{ideator-future.ideas}}\n\nRisks from pre-mortem: {{premortem-analyst.risks}}\n\nProduce:\n1. top_ideas: best 2-3 ideas with rationale\n2. critical_risks: top 3 risks with mitigations\n3. unknowns: what we don't know yet\n4. success_criterion: one measurable signal of success\n5. mvp_if_halved: scope if time is cut in half\n6. verdict: READY_TO_PLAN | NEEDS_INVESTIGATION | STOP\n7. verdict_reason: one sentence"
     }

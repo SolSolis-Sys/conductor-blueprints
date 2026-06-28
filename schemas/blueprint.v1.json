@@ -93,9 +93,9 @@
           "role": { "type": "string", "pattern": "^[a-z0-9-]+$" },
           "type": {
             "type": "string",
-            "enum": ["agent", "tool"],
+            "enum": ["agent", "tool", "gate"],
             "default": "agent",
-            "description": "Step type. 'agent' (default) = LLM call. 'tool' = deterministic command, no LLM."
+            "description": "Step type. 'agent' (default) = LLM call. 'tool' = deterministic command, no LLM. 'gate' = decision checkpoint that controls flow based on upstream outputs."
           },
           "prompt": {
             "type": "string",
@@ -130,7 +130,7 @@
           }
         }
       },
-      "description": "Ordered steps: 'agent' (LLM) or 'tool' (deterministic). Mix freely. Variables: {{role-name.field}} or {{output_var}} from tool steps."
+      "description": "Ordered steps: 'agent' (LLM), 'tool' (deterministic), or 'gate' (decision checkpoint). Mix freely. Variables: {{role-name.field}} or {{output_var}} from tool steps."
     },
     "loop": {
       "type": "object",

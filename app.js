@@ -443,6 +443,125 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(ta);
     }
 
+    function renderPipelinePanel(blueprint, container) {
+        const panel = document.createElement('div');
+        panel.className = 'pipeline-panel';
+
+        const phases = blueprint.loop && Array.isArray(blueprint.loop.phases) && blueprint.loop.phases.length > 0
+            ? blueprint.loop.phases
+            : null;
+
+        if (phases) {
+            phases.forEach(phase => {
+                const stage = document.createElement('div');
+                const mode = phase.mode === 'parallel' ? 'parallel' : 'sequential';
+                stage.className = 'stage stage-' + mode;
+
+                const header = document.createElement('div');
+                header.className = 'stage-header';
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = phase.name || '';
+                const modeSpan = document.createElement('span');
+                modeSpan.textContent = mode;
+                header.appendChild(nameSpan);
+                header.appendChild(modeSpan);
+                stage.appendChild(header);
+
+                const agents = Array.isArray(phase.agents) ? phase.agents : [];
+                agents.forEach(agent => {
+                    stage.appendChild(buildStepEl(agent));
+                });
+                panel.appendChild(stage);
+            });
+        } else {
+            const stage = document.createElement('div');
+            stage.className = 'stage stage-sequential';
+            const agents = Array.isArray(blueprint.agents) ? blueprint.agents : [];
+            agents.forEach(agent => {
+                stage.appendChild(buildStepEl(agent));
+            });
+            panel.appendChild(stage);
+        }
+
+        // install-cmd row
+        const installCmd = document.createElement('div');
+        installCmd.className = 'install-cmd';
+        const cmdSpan = document.createElement('span');
+        cmdSpan.textContent = 'conductor hub install ' + blueprint.name;
+        const copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.textContent = 'Copy';
+        copyBtn.addEventListener('click', () => {
+            const cmd = 'conductor hub install ' + blueprint.name;
+            const restore = () => {
+                copyBtn.textContent = 'Copy';
+            };
+            const done = () => {
+                copyBtn.textContent = 'Copied!';
+                setTimeout(restore, 1500);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(cmd).then(done).catch(done);
+            } else {
+                fallbackCopy(cmd, done);
+            }
+        });
+        installCmd.appendChild(cmdSpan);
+        installCmd.appendChild(copyBtn);
+        panel.appendChild(installCmd);
+
+        container.appendChild(panel);
+    }
+
+    function buildStepEl(agent) {
+        const step = document.createElement('div');
+        step.className = 'step';
+
+        const stepHeader = document.createElement('div');
+        stepHeader.className = 'step-header';
+
+        const roleSpan = document.createElement('span');
+        roleSpan.className = 'step-role';
+        roleSpan.textContent = agent.role || '';
+
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'step-type-badge';
+        if (agent.type === 'tool') {
+            badgeSpan.textContent = '🔧 tool';
+            badgeSpan.classList.add('type-tool');
+        } else if (agent.type === 'gate') {
+            badgeSpan.textContent = '🏁 gate';
+            badgeSpan.classList.add('type-gate');
+        } else {
+            badgeSpan.textContent = '🤖 agent';
+            badgeSpan.classList.add('type-agent');
+        }
+
+        stepHeader.appendChild(roleSpan);
+        stepHeader.appendChild(badgeSpan);
+        step.appendChild(stepHeader);
+
+        if (agent.prompt) {
+            const promptDiv = document.createElement('div');
+            promptDiv.className = 'step-prompt';
+            const fullText = agent.prompt;
+            const preview = fullText.length > 80 ? fullText.slice(0, 80) + '…' : fullText;
+            promptDiv.textContent = preview;
+            promptDiv.addEventListener('click', () => {
+                if (promptDiv.classList.contains('expanded')) {
+                    promptDiv.classList.remove('expanded');
+                    promptDiv.textContent = preview;
+                } else {
+                    promptDiv.classList.add('expanded');
+                    promptDiv.textContent = fullText;
+                }
+            });
+            step.appendChild(promptDiv);
+        }
+
+        return step;
+    }
+
     function renderModal(blueprint) {
         const flow = parseFlow(blueprint.description);
         const flowHTML = flow.length >= 2 ? `
@@ -479,6 +598,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="install-btn" data-repo="${blueprint.repo}">${t('install')}</button>
             </div>
         `;
+
+        // async: fetch individual blueprint.json for pipeline view
+        (async () => {
+            try {
+                const rawUrl = `https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/blueprints/${blueprint.name}/blueprint.json`;
+                const res = await fetch(rawUrl);
+                if (!res.ok) return;
+                const bpData = await res.json();
+                renderPipelinePanel(bpData, modalContent);
+            } catch (_) { /* silent fail — modal still usable */ }
+        })();
 
         modalContent.querySelector('.install-btn').addEventListener('click', () => {
             const rawUrl = `https://raw.githubusercontent.com/SolSolis-Sys/conductor-blueprints/main/blueprints/${blueprint.name}/blueprint.json`;

@@ -911,3 +911,126 @@ body.modal-open { overflow: hidden; }
         border-top-color: var(--accent);
     }
 }
+
+/* === hub-pipeline-view enhancement === */
+.pipeline-panel {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stage {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.stage-header {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stage-parallel > .stage-header {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.stage-sequential > .stage-header {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.step {
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.step:first-of-type {
+  border-top: none;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.step-role {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.step-type-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
+.type-tool {
+  background: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.type-agent {
+  background: #e9d5ff;
+  color: #6d28d9;
+}
+
+.type-gate {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.step-prompt {
+  font-size: 0.78rem;
+  color: #475569;
+  max-height: 3.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  line-height: 1.45;
+}
+
+.step-prompt.expanded {
+  max-height: none;
+}
+
+.install-cmd {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.install-cmd button {
+  margin-left: auto;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  color: #334155;
+}
+
+.install-cmd button:hover {
+  background: #f1f5f9;
+}
+/* === end hub-pipeline-view === */
